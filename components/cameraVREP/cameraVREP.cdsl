@@ -1,0 +1,13 @@
+import "CameraSimple.idsl";
+
+Component cameraVREP
+{
+    Communications
+    {
+        implements CameraSimple;
+    };
+	language python;
+	//options agmagent;
+	//options InnerModelViewer;
+};
+
