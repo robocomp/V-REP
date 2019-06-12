@@ -18,8 +18,6 @@
 #
 
 from genericworker import *
-import sys
-sys.path.insert(0, './vrep_api')
 import vrep
 import cv2
 import math
