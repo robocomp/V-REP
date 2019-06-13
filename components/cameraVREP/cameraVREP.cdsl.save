@@ -1,0 +1,17 @@
+import "";
+
+Component cameraVREP
+{
+    Communications
+    {
+        implements interfaceName;
+        requires otherName;
+        subscribesTo topicToSubscribeTo;
+        publishes topicToPublish;
+    };
+	language Cpp//Cpp11//python;
+	gui Qt(QWidget//QDialog//QMainWindow);
+	//options agmagent;
+	//options InnerModelViewer;
+};
+
