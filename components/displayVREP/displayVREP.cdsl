@@ -1,0 +1,14 @@
+import "Display.idsl";
+
+Component displayVREP
+{
+    Communications
+    {
+        implements Display;
+    };
+	language python;
+
+	//options agmagent;
+	//options InnerModelViewer;
+};
+
