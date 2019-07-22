@@ -23,7 +23,7 @@ The first thing we need is to set up the environment.
 Now, on VREP your scene needs to start a server so that the python scripts can connect to it. To start the server you have to add a threaded script to an object in your scene that will start the server.
 - Open the bubbleRob scene.
 - Click on any of the cylinders you used as obstacles
-- Click on Add→Associated Child ScriptrightarrowThreaded Script
+- Click on Add→Associated Child Script→Threaded Script
 - Open the script by double clicking on the “file” icon next to the cylinder
 - Find the function sysCall_threadmain()
 - Write the following as the only line in that method: simExtRemoteApiStart(19999).
