@@ -19,7 +19,6 @@
 
 from genericworker import *
 import vrep
-import time
 
 # If RoboComp was compiled with Python bindings you can use InnerModel in Python
 # sys.path.append('/opt/robocomp/lib')
@@ -28,23 +27,21 @@ import time
 # import librobocomp_innermodel
 
 class SpecificWorker(GenericWorker):
-	clientID = vrep.simxStart('192.168.1.40',19997,True,True,5000,5)
+	clientID = vrep.simxStart('192.168.1.40',19999,True,True,5000,5)
 	if clientID != -1:
 	    print ('Connected to remote API server')
 	    mode = vrep.simx_opmode_blocking
-	    res, robot = vrep.simxGetObjectHandle(clientID,"hexapod", mode)
-	    res, laser = vrep.simxGetObjectHandle(clientID,"LaserScannerLaser_2D", mode)
-	    res, camhandle = vrep.simxGetObjectHandle(clientID, 'Vision_sensor', vrep.simx_opmode_oneshot_wait)
-	    res, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
-	    res,data=vrep.simxGetStringSignal(clientID,'MySignal',vrep.simx_opmode_streaming)
-	    time.sleep(1)
+	    res, robot = vrep.simxGetObjectHandle(clientID,"Plane", mode)
+	    emptyBuff = bytearray()
+
 
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
 		self.timer.timeout.connect(self.compute)
 		self.Period = 2000
 		self.timer.start(self.Period)
-		self.laserData = []
+		#path to the image EBO
+		self.setImageFromFile("/home/carlos/Escritorio/hexapod/sad.png")
 
 	def __del__(self):
 		print 'SpecificWorker destructor'
@@ -60,47 +57,27 @@ class SpecificWorker(GenericWorker):
 	@QtCore.Slot()
 	def compute(self):
 		print 'SpecificWorker.compute...'
-		#computeCODE
-		res,data=vrep.simxGetStringSignal(self.clientID,'MySignal',vrep.simx_opmode_buffer)
-		if (data):
-			laserDetectedPoints= vrep.simxUnpackFloats(data)
-
-			for i in range(len(laserDetectedPoints)/2):
-				singleLaser = TData()
-				singleLaser.dist = laserDetectedPoints[2*i]
-				singleLaser.angle = laserDetectedPoints[2*i+1]
-				self.laserData.append(singleLaser)
-			time.sleep(2)
 
 		return True
 
 
 	#
-	# getLaserData
+	# setImageFromFile
 	#
-	def getLaserData(self):
-
-		return self.laserData
+	def setImageFromFile(self, pathImg):
+		#
+		res,outInts,outFloats,outStrings,outBuffer=\
+		vrep.simxCallScriptFunction(self.clientID,'EBO_Screen', vrep.sim_scripttype_childscript,\
+		'applyTexture',[],[],[pathImg],self.emptyBuff, vrep.simx_opmode_blocking)
+		#
+		pass
 
 
 	#
-	# getLaserConfData
+	# setImage
 	#
-	def getLaserConfData(self):
-		ret = LaserConfData()
+	def setImage(self, img):
 		#
 		#implementCODE
 		#
-		return ret
-
-
-	#
-	# getLaserAndBStateData
-	#
-	def getLaserAndBStateData(self):
-		ret = TLaserData()
-		#
-		#implementCODE
-		#
-		bState = RoboCompGenericBase.TBaseState()
-		return [ret, bState]
+		pass
