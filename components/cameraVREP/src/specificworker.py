@@ -21,8 +21,8 @@ from genericworker import *
 import vrep
 import cv2
 import math
-import numpy as np
 import time
+import numpy as np
 
 # If RoboComp was compiled with Python bindings you can use InnerModel in Python
 # sys.path.append('/opt/robocomp/lib')
@@ -32,21 +32,23 @@ import time
 
 class SpecificWorker(GenericWorker):
 
-	clientID = vrep.simxStart('192.168.1.40',19999,True,True,5000,5)
-	if clientID != -1:
-	    print ('Connected to remote API server')
-	    mode = vrep.simx_opmode_blocking
-	    res, robot = vrep.simxGetObjectHandle(clientID,"hexapod", mode)
-	    res, camhandle = vrep.simxGetObjectHandle(clientID, 'Vision_sensor', vrep.simx_opmode_oneshot_wait)
-	    res, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
-	    time.sleep(1)
 
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
+		clientID = vrep.simxStart('127.0.0.1',19997,True,True,5000,5)
+		if clientID != -1:
+			print ('Connected to remote API server')
+			mode = vrep.simx_opmode_blocking
+			# res, robot = vrep.simxGetObjectHandle(clientID,"hexapod", mode)
+			res, camhandle = vrep.simxGetObjectHandle(clientID, 'ePuck_lightSensor', vrep.simx_opmode_oneshot_wait)
+			res, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
+
 		self.timer.timeout.connect(self.compute)
 		self.Period = 2000
 		self.timer.start(self.Period)
 		self.im = TImage()
+		self.camhandle = camhandle
+		self.clientID = clientID
 
 	def __del__(self):
 		print 'SpecificWorker destructor'
@@ -63,14 +65,7 @@ class SpecificWorker(GenericWorker):
 	def compute(self):
 		print 'SpecificWorker.compute...'
 		#computeCODE
-		res, resolution, image=vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_buffer)
-		img = np.array(image, dtype = np.uint8)
-		img.resize([resolution[0], resolution[1], 3])
-		img = np.rot90(img,2)
-		img = np.fliplr(img)
-		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-		
-		self.im = img
+
 
 		return True
 
@@ -79,5 +74,16 @@ class SpecificWorker(GenericWorker):
 	# getImage
 	#
 	def getImage(self):
-		#
-		return self.im
+		res, resolution, image = vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_buffer)
+		img = np.array(image, dtype = np.uint8)
+		img.resize([resolution[1], resolution[0], 3])
+		img = np.rot90(img,2)
+		img = np.fliplr(img)
+		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+		
+		# #
+		im = TImage()
+		im.image = img.data
+		im.width, im.height, im.depth = img.shape
+
+		return im
