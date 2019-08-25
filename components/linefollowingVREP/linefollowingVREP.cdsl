@@ -1,0 +1,15 @@
+import "DifferentialRobot.idsl";
+import "CameraSimple.idsl";
+import "Laser.idsl";
+
+Component linefollowingVREP
+{
+    Communications
+    {
+        requires DifferentialRobot;
+	requires CameraSimple;
+	requires Laser;
+    };	
+
+    language python;
+};
