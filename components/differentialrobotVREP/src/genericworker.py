@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2019 by YOUR NAME HERE
 #
@@ -19,7 +17,7 @@
 #    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, Ice, os
-from PySide2 import QtWidgets, QtCore
+from PySide import QtGui, QtCore
 
 ROBOCOMP = ''
 try:
@@ -56,33 +54,33 @@ if not ice_DifferentialRobot:
 	print 'Couln\'t load DifferentialRobot'
 	sys.exit(-1)
 from RoboCompDifferentialRobot import *
-ice_DifferentialRobot = False
+ice_GenericBase = False
 for p in icePaths:
-	if os.path.isfile(p+'/DifferentialRobot.ice'):
+	if os.path.isfile(p+'/GenericBase.ice'):
 		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"DifferentialRobot.ice"
+		wholeStr = preStr+"GenericBase.ice"
 		Ice.loadSlice(wholeStr)
-		ice_DifferentialRobot = True
+		ice_GenericBase = True
 		break
-if not ice_DifferentialRobot:
-	print 'Couln\'t load DifferentialRobot'
+if not ice_GenericBase:
+	print 'Couln\'t load GenericBase'
 	sys.exit(-1)
-from RoboCompDifferentialRobot import *
+from RoboCompGenericBase import *
 
 
 from differentialrobotI import *
 
 
 class GenericWorker(QtCore.QObject):
-
 	kill = QtCore.Signal()
+
 
 	def __init__(self, mprx):
 		super(GenericWorker, self).__init__()
 
 
 
-		
+
 		self.mutex = QtCore.QMutex(QtCore.QMutex.Recursive)
 		self.Period = 30
 		self.timer = QtCore.QTimer(self)

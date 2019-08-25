@@ -20,7 +20,7 @@
 #    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# \mainpage RoboComp::DifferentialRobotVREP
+# \mainpage RoboComp::differentialrobotVREP
 #
 # \section intro_sec Introduction
 #
@@ -48,7 +48,7 @@
 #
 # \subsection execution_ssec Execution
 #
-# Just: "${PATH_TO_BINARY}/DifferentialRobotVREP --Ice.Config=${PATH_TO_CONFIG_FILE}"
+# Just: "${PATH_TO_BINARY}/differentialrobotVREP --Ice.Config=${PATH_TO_CONFIG_FILE}"
 #
 # \subsection running_ssec Once running
 #
@@ -60,7 +60,7 @@ import sys, traceback, IceStorm, subprocess, threading, time, Queue, os, copy
 # Ctrl+c handling
 import signal
 
-from PySide2 import QtCore
+from PySide import QtGui, QtCore
 
 from specificworker import *
 
@@ -68,6 +68,7 @@ from specificworker import *
 class CommonBehaviorI(RoboCompCommonBehavior.CommonBehavior):
 	def __init__(self, _handler):
 		self.handler = _handler
+		self.communicator = _communicator
 	def getFreq(self, current = None):
 		self.handler.getFreq()
 	def setFreq(self, freq, current = None):
@@ -88,10 +89,8 @@ class CommonBehaviorI(RoboCompCommonBehavior.CommonBehavior):
 			status = 1
 			return
 
-#SIGNALS handler
-def sigint_handler(*args):
-	QtCore.QCoreApplication.quit()
-    
+
+
 if __name__ == '__main__':
 	app = QtCore.QCoreApplication(sys.argv)
 	params = copy.deepcopy(sys.argv)
@@ -109,16 +108,13 @@ if __name__ == '__main__':
 	if status == 0:
 		worker = SpecificWorker(mprx)
 		worker.setParams(parameters)
-	else:
-		print "Error getting required connections, check config file"
-		sys.exit(-1)
 
 	adapter = ic.createObjectAdapter('DifferentialRobot')
 	adapter.add(DifferentialRobotI(worker), ic.stringToIdentity('differentialrobot'))
 	adapter.activate()
 
 
-	signal.signal(signal.SIGINT, sigint_handler)
+	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	app.exec_()
 
 	if ic:
