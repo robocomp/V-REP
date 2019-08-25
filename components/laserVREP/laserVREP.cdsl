@@ -5,10 +5,7 @@ Component laserVREP
     Communications
     {
         implements Laser;
-        //subscribesTo topicToSubscribeTo;
-        //publishes topicToPublish;
     };
-	language python;
-	//options agmagent;
-	//options InnerModelViewer;
+
+    language python;
 };

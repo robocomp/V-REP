@@ -17,7 +17,7 @@
 #    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, Ice, os
-from PySide2 import QtWidgets, QtCore
+from PySide import QtGui, QtCore
 
 ROBOCOMP = ''
 try:
@@ -42,6 +42,18 @@ except:
 	print 'SLICE_PATH environment variable was not exported. Using only the default paths'
 	pass
 
+ice_Laser = False
+for p in icePaths:
+	if os.path.isfile(p+'/Laser.ice'):
+		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
+		wholeStr = preStr+"Laser.ice"
+		Ice.loadSlice(wholeStr)
+		ice_Laser = True
+		break
+if not ice_Laser:
+	print 'Couln\'t load Laser'
+	sys.exit(-1)
+from RoboCompLaser import *
 ice_GenericBase = False
 for p in icePaths:
 	if os.path.isfile(p+'/GenericBase.ice'):
