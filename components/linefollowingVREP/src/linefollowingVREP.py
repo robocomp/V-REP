@@ -20,7 +20,7 @@
 #    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# \mainpage RoboComp::laserVREP
+# \mainpage RoboComp::linefollowingVREP
 #
 # \section intro_sec Introduction
 #
@@ -48,7 +48,7 @@
 #
 # \subsection execution_ssec Execution
 #
-# Just: "${PATH_TO_BINARY}/laserVREP --Ice.Config=${PATH_TO_CONFIG_FILE}"
+# Just: "${PATH_TO_BINARY}/linefollowingVREP --Ice.Config=${PATH_TO_CONFIG_FILE}"
 #
 # \subsection running_ssec Once running
 #
@@ -105,14 +105,60 @@ if __name__ == '__main__':
 	parameters = {}
 	for i in ic.getProperties():
 		parameters[str(i)] = str(ic.getProperties().getProperty(i))
+
+	# Remote object connection for CameraSimple
+	try:
+		proxyString = ic.getProperties().getProperty('CameraSimpleProxy')
+		try:
+			basePrx = ic.stringToProxy(proxyString)
+			camerasimple_proxy = CameraSimplePrx.checkedCast(basePrx)
+			mprx["CameraSimpleProxy"] = camerasimple_proxy
+		except Ice.Exception:
+			print 'Cannot connect to the remote object (CameraSimple)', proxyString
+			#traceback.print_exc()
+			status = 1
+	except Ice.Exception, e:
+		print e
+		print 'Cannot get CameraSimpleProxy property.'
+		status = 1
+
+
+	# Remote object connection for DifferentialRobot
+	try:
+		proxyString = ic.getProperties().getProperty('DifferentialRobotProxy')
+		try:
+			basePrx = ic.stringToProxy(proxyString)
+			differentialrobot_proxy = DifferentialRobotPrx.checkedCast(basePrx)
+			mprx["DifferentialRobotProxy"] = differentialrobot_proxy
+		except Ice.Exception:
+			print 'Cannot connect to the remote object (DifferentialRobot)', proxyString
+			#traceback.print_exc()
+			status = 1
+	except Ice.Exception, e:
+		print e
+		print 'Cannot get DifferentialRobotProxy property.'
+		status = 1
+
+
+	# Remote object connection for Laser
+	try:
+		proxyString = ic.getProperties().getProperty('LaserProxy')
+		try:
+			basePrx = ic.stringToProxy(proxyString)
+			laser_proxy = LaserPrx.checkedCast(basePrx)
+			mprx["LaserProxy"] = laser_proxy
+		except Ice.Exception:
+			print 'Cannot connect to the remote object (Laser)', proxyString
+			#traceback.print_exc()
+			status = 1
+	except Ice.Exception, e:
+		print e
+		print 'Cannot get LaserProxy property.'
+		status = 1
+
 	if status == 0:
 		worker = SpecificWorker(mprx)
 		worker.setParams(parameters)
-
-	adapter = ic.createObjectAdapter('Laser')
-	adapter.add(LaserI(worker), ic.stringToIdentity('laser'))
-	adapter.activate()
-
 
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
 	app.exec_()

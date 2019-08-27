@@ -1,5 +1,6 @@
-# Endpoints for implemented interfaces
-DifferentialRobot.Endpoints=tcp -p 0
+# Proxies for required interfaces
+LaserProxy = laser:tcp -h localhost -p 10179
+DifferentialRobotProxy = differentialrobot:tcp -h localhost -p 10177
 
 
 
@@ -10,6 +11,7 @@ TopicManager.Proxy=IceStorm/TopicManager:default -p 9999
 Ice.Warn.Connections=0
 Ice.Trace.Network=0
 Ice.Trace.Protocol=0
-
+Ice.ACM.Client=10
+Ice.ACM.Server=10
 
 

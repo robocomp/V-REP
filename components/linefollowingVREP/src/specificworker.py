@@ -17,11 +17,10 @@
 #    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys, os, traceback, time
+
+from PySide import QtGui, QtCore
 from genericworker import *
-import vrep
-import cv2
-import math
-import time
 import numpy as np
 
 # If RoboComp was compiled with Python bindings you can use InnerModel in Python
@@ -31,27 +30,11 @@ import numpy as np
 # import librobocomp_innermodel
 
 class SpecificWorker(GenericWorker):
-
-
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
-		clientID = vrep.simxStart('127.0.0.1',19997,True,True,5000,5)
-		if clientID != -1:
-			print ('Connected to remote API server')
-			mode = vrep.simx_opmode_blocking
-			# res, robot = vrep.simxGetObjectHandle(clientID,"hexapod", mode)
-			res, camhandle = vrep.simxGetObjectHandle(clientID, 'ePuck_lightSensor', vrep.simx_opmode_oneshot_wait)
-			res, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
-
 		self.timer.timeout.connect(self.compute)
 		self.Period = 2000
 		self.timer.start(self.Period)
-		self.im = TImage()
-		self.camhandle = camhandle
-		self.clientID = clientID
-
-	def __del__(self):
-		print 'SpecificWorker destructor'
 
 	def setParams(self, params):
 		#try:
@@ -64,26 +47,25 @@ class SpecificWorker(GenericWorker):
 	@QtCore.Slot()
 	def compute(self):
 		print 'SpecificWorker.compute...'
-		#computeCODE
 
+		while(1):
+			data = self.camerasimple_proxy.getImage()
+			arr = np.fromstring(data.image, np.uint8)
+			img = np.reshape(arr, (data.width, data.height, data.depth))
+
+			lightSens = [img[0, 1, 1], img[0, 7, 1], img[0, 14, 1]]
+			v = 44
+			omega = 0
+			if lightSens and ((lightSens[0]<50)or(lightSens[1]<50)or(lightSens[2]<50)):
+				if (lightSens[0]<50):
+					omega = 0.7
+				if (lightSens[2]<50):
+					omega = -0.7
+			else:
+				v=44
+				omega=0
+
+			self.differentialrobot_proxy.setSpeedBase(v, omega)
 
 		return True
 
-
-	#
-	# getImage
-	#
-	def getImage(self):
-		res, resolution, image = vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_buffer)
-		img = np.array(image, dtype = np.uint8)
-		img.resize([resolution[1], resolution[0], 3])
-		img = np.rot90(img,2)
-		img = np.fliplr(img)
-		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-		
-		# #
-		im = TImage()
-		im.image = img.data
-		im.width, im.height, im.depth = img.shape
-
-		return im

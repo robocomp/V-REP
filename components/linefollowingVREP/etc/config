@@ -1,5 +1,8 @@
-# Endpoints for implemented interfaces
-Laser.Endpoints=tcp -p 10179
+# Proxies for required interfaces
+DifferentialRobotProxy = differentialrobot:tcp -h localhost -p 10177
+CameraSimpleProxy = camerasimple:tcp -h localhost -p 10178
+#LaserProxy = laser:tcp -h localhost -p 10003
+
 
 
 
