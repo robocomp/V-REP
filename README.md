@@ -37,5 +37,110 @@ Next, we will introduce how one can test the [linefollowingVREP](https://github.
 
 ### Description
 
-This component communicates with cameraVREP component to get images of the floor (floor is in the scene simulated on V-REP). And, using that image it determines the directions to move so as to follow the path on the floor. The below image shows the V-REP scene with the black-colored path drawn on the floor:
+This component communicates with cameraVREP component to get images of the floor (floor is in the scene simulated on V-REP). And, using that image it determines the directions to move so as to follow the path on the floor.
+The below image shows the V-REP scene with the black-colored path drawn on the floor:
+
+![Path](./doc/images/path.png)
+
+The linefollowingVREP component communicates with cameraVREP component to get the image of the floor, which looks like:
+
+![camera Image](./doc/images/cameraImage.png)
+
+Using the image (which looks like above image), linefollwingVREP component determines which direction to move, for example:
+- if the black patch is in the center of image (as in the above image), implies robot has to move straight.
+- if the black patch is in the right of image, implies robot has to turn right.
+- if the black patch is in the left of image, implies robot has to turn left.
+
+To turn to the determined direction, linefollowingVREP component communicates with differentialrobotVREP component.
+
+## Testing the Component
+
+For testing copy the folders [*cameraVREP*](./components/cameraVREP), [*differentialrobotVREP*](./components/differentialrobotVREP), [*linefollowingVREP*](./components/linefollowingVREP) inside robocomp/components/.
+And the scene file for testing the component can be found [here](./components/hexapod/lineFollowerDemo.ttt).
+
+#### Edit Configuration file
+
+Now, to enable the linefollowingVREP component to communicate, we need to tell the linefollowingVREP component where to find the differentialrobotVREP and the cameraVREP interfaces. 
+
+> **Note:** In the current scenario, linefollowingVREP component is a client that communicates with differentialrobotVREP and cameraVREP components.
+
+> **You can find the port on which cameraVREP and differentialrobotVREP are hosted in _etc/config_ file inside the respective components directory.**
+
+
+
+So, now we need to change the ports in the configuration file of linefollowingVREP components accordingly.
+
+```
+# go inside the component
+cd V-REP/components/linefollowingVREP
+
+# open the config file of the component in any editor. For example,
+vim etc/config
+
+```
+
+Now, change the port numbers on which cameraVREP and differentialrobotVREP accordingly i.e change the port numbers in the following lines:
+
+```python
+DifferentialRobotProxy = differentialrobot:tcp -h localhost -p 10177
+CameraSimpleProxy = camerasimple:tcp -h localhost -p 10178
+```
+
+
+> **Note: The current config files are already well setted up, so you can test the components directly**.
+
+
+
+#### Running the component
+
+```
+cd robocomp/components/
+```
+Open 4 new terminals.
+
+Terminal 1: 
+```
+1. Open the scene lineFollowerDemo.ttt in V-REP.
+2. Now, start the scene. That will start the server with two socket at 19999, 19997.
+```
+
+Terminal 2:
+```
+cd differentialrobotVREP
+python src/differentialrobotVREP.py --Ice.Config=etc/config
+```
+
+Terminal 3: 
+```
+cd cameraVREP
+python src/cameraVREP.py --Ice.Config=etc/config
+```
+
+Terminal 4: 
+```
+cd linefollowingVREP
+python src/linefollowingVREP.py --Ice.Config=etc/config
+```
+
+
+Now, switch to the V-REP simulator and see the robot following the path on the floor. Here, is the demo of the same:
+
+
+
+![linefollower](./doc/images/linefollower.gif)
+
+
+
+
+---------------------------------------------------------------------
+You can find more tutorials on RoboComp.VREP in [tutorials](doc/README.md) 
+
+Drop comments and ask questions in:
+
+- https://groups.google.com/forum/?hl=en#!forum/robocomp-dev
+- https://gitter.im/robocomp
+
+Please, report any bugs to pbustos@unex.es
+
+If you have any suggestions to improve the repository, like features or tutorials, please contact: robocomp.team@gmail.com 
 
