@@ -55,8 +55,9 @@ To turn to the determined direction, linefollowingVREP component communicates wi
 
 ## Testing the Component
 
-For testing copy the folders [*cameraVREP*](./components/cameraVREP), [*differentialrobotVREP*](./components/differentialrobotVREP), [*linefollowingVREP*](./components/linefollowingVREP) inside robocomp/components/.
-And the scene file for testing the component can be found [here](./components/hexapod/lineFollowerDemo.ttt).
+For testing, copy the folders [*cameraVREP*](./components/cameraVREP), [*differentialrobotVREP*](./components/differentialrobotVREP), [*linefollowingVREP*](./components/linefollowingVREP) inside _robocomp/components/_.
+
+And, the scene file for testing the component can be found [here](./components/hexapod/lineFollowerDemo.ttt).
 
 #### Edit Configuration file
 
