@@ -7,7 +7,7 @@ by [RoboLab](http://robolab.unex.es), [Aston University](https://www2.aston.ac.u
 
 RoboComp is an open-source Robotics framework providing the tools to create and modify software components that communicate through public interfaces. RoboComp’s existing simulator, RCIS, is based on OpenSceneGraph technology and custom made actuators and sensor. This repository contains the prototypes of robotics simulation using V-REP that use V-REP's API to connect them to RoboComp ecosystem. Specifically, this repo consists of RoboComp components that uses V-REP as an external simulator.
 
-**If you don't have RoboComp installed on your system, find the installation instructions [here](https://github.com/robocomp/robocomp).**
+> **If you don't have RoboComp installed on your system, find the installation instructions [here](https://github.com/robocomp/robocomp).**
 
 
 # V-REP installation
@@ -31,7 +31,7 @@ From here on, we assume you are familiar with RoboComp and the working of compon
 
 Next, we will introduce how one can test the [linefollowingVREP](https://github.com/robocomp/V-REP/tree/master/components/linefollowingVREP) component.
 
-**Note:**  Before moving further, make sure you have RoboComp and V-REP installed on your system.
+> **Note:**  Before moving further, make sure you have RoboComp and V-REP installed on your system.
 
 # linefollowingVREP Component
 
