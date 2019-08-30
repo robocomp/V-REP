@@ -1,7 +1,7 @@
 [RoboComp.VREP Components](http://robocomp.org)
 ===============================
 
-[![Join the chat at https://gitter.im/robocomp/V-REP](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/robocomp/robocomp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/robocomp/V-REP](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/robocomp/V-REP?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 by [RoboLab](http://robolab.unex.es), [Aston University](https://www2.aston.ac.uk/eas), [ISIS](http://www.grupoisis.uma.es/index.php?option=com_jresearch&view=staff&Itemid=3&lang=es) and many other collaborators.
 
@@ -34,4 +34,8 @@ Next, we will introduce how one can test the [linefollowingVREP](https://github.
 **Note:**  Before moving further, make sure you have RoboComp and V-REP installed on your system.
 
 # linefollowingVREP Component
+
+### Description
+
+This component communicates with cameraVREP component to get images of the floor (floor is in the scene simulated on V-REP). And, using that image it determines the directions to move so as to follow the path on the floor. The below image shows the V-REP scene with the black-colored path drawn on the floor:
 
