@@ -1,0 +1,11 @@
+import "OmniRobot.idsl";
+
+Component viriatoVREP
+{
+    Communications
+    {
+        implements OmniRobot;
+    };
+	language python;
+};
+
