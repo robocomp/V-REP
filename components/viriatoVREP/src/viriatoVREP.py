@@ -55,7 +55,7 @@
 #
 #
 
-# import sys, traceback, IceStorm, subprocess, threading, time, os, copy
+import sys, traceback, IceStorm, subprocess, threading, time, queue, os, copy
 
 # Ctrl+c handling
 import signal
@@ -63,7 +63,6 @@ import signal
 from PySide2 import QtCore
 
 from specificworker import *
-from copy import deepcopy
 
 
 class CommonBehaviorI(RoboCompCommonBehavior.CommonBehavior):
@@ -95,7 +94,7 @@ def sigint_handler(*args):
     
 if __name__ == '__main__':
 	app = QtCore.QCoreApplication(sys.argv)
-	params = deepcopy(sys.argv)
+	params = copy.deepcopy(sys.argv)
 	if len(params) > 1:
 		if not params[1].startswith('--Ice.Config='):
 			params[1] = '--Ice.Config=' + params[1]
@@ -114,8 +113,8 @@ if __name__ == '__main__':
 		print("Error getting required connections, check config file")
 		sys.exit(-1)
 
-	adapter = ic.createObjectAdapter('OmniRobot')
-	adapter.add(OmniRobotI(worker), ic.stringToIdentity('omnirobot'))
+	adapter = ic.createObjectAdapter('DifferentialRobot')
+	adapter.add(DifferentialRobotI(worker), ic.stringToIdentity('differentialrobot'))
 	adapter.activate()
 
 

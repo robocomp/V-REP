@@ -44,33 +44,33 @@ except:
 	print('SLICE_PATH environment variable was not exported. Using only the default paths')
 	pass
 
-ice_OmniRobot = False
+ice_DifferentialRobot = False
 for p in icePaths:
-	if os.path.isfile(p+'/OmniRobot.ice'):
+	if os.path.isfile(p+'/DifferentialRobot.ice'):
 		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"OmniRobot.ice"
+		wholeStr = preStr+"DifferentialRobot.ice"
 		Ice.loadSlice(wholeStr)
-		ice_OmniRobot = True
+		ice_DifferentialRobot = True
 		break
-if not ice_OmniRobot:
-	print('Couln\'t load OmniRobot')
+if not ice_DifferentialRobot:
+	print('Couln\'t load DifferentialRobot')
 	sys.exit(-1)
-from RoboCompOmniRobot import *
-ice_OmniRobot = False
+from RoboCompDifferentialRobot import *
+ice_DifferentialRobot = False
 for p in icePaths:
-	if os.path.isfile(p+'/OmniRobot.ice'):
+	if os.path.isfile(p+'/DifferentialRobot.ice'):
 		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"OmniRobot.ice"
+		wholeStr = preStr+"DifferentialRobot.ice"
 		Ice.loadSlice(wholeStr)
-		ice_OmniRobot = True
+		ice_DifferentialRobot = True
 		break
-if not ice_OmniRobot:
-	print ('Couln\'t load OmniRobot')
+if not ice_DifferentialRobot:
+	print('Couln\'t load DifferentialRobot')
 	sys.exit(-1)
-from RoboCompOmniRobot import *
+from RoboCompDifferentialRobot import *
 
 
-from omnirobotI import *
+from differentialrobotI import *
 
 
 class GenericWorker(QtCore.QObject):
