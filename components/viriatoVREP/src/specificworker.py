@@ -33,7 +33,7 @@ class SpecificWorker(GenericWorker):
 		super(SpecificWorker, self).__init__(proxy_map)
 		self.handler = ViriatoBridge("127.0.0.1", 19997)
 		self.timer.timeout.connect(self.compute)
-		self.Period = 400
+		self.Period = 1000
 		self.timer.start(self.Period)
 
 
@@ -51,8 +51,9 @@ class SpecificWorker(GenericWorker):
 	@QtCore.Slot()
 	def compute(self):
 		print("compute")
-		x, z, alpha = self.handler.get_base_pose()
-		print(x,z,alpha)
+		self.x, self.z, self.alpha = self.handler.get_base_pose()
+		print(self.x,self.z,self.alpha)
+		self.handler.set_base_speed(0,0,0)
 		return True
 
 # =============== Methods for Component Implements ==================
@@ -72,13 +73,7 @@ class SpecificWorker(GenericWorker):
 	# getBasePose
 	#
 	def getBasePose(self):
-		#
-		# implementCODE
-		#
-		x = int()
-		z = int()
-		alpha = float()
-		return [x, z, alpha]
+		return [self.x, self.z, self.alpha]
 
 
 	#
@@ -105,10 +100,10 @@ class SpecificWorker(GenericWorker):
 	# getBaseState
 	#
 	def getBaseState(self):
-		#
-		# implementCODE
-		#
 		state = RoboCompGenericBase.TBaseState()
+		state.x = self.x
+		state.z = self.z
+		state.alpha = self.alpha
 		return state
 
 
@@ -116,19 +111,12 @@ class SpecificWorker(GenericWorker):
 	# setOdometerPose
 	#
 	def setOdometerPose(self, x, z, alpha):
-		#
-		# implementCODE
-		#
 		pass
-
 
 	#
 	# stopBase
 	#
 	def stopBase(self):
-		#
-		# implementCODE
-		#
 		pass
 
 
@@ -136,10 +124,7 @@ class SpecificWorker(GenericWorker):
 	# setSpeedBase
 	#
 	def setSpeedBase(self, advx, advz, rot):
-		#
-		# implementCODE
-		#
-		pass
+		self.handler.setSpeedBase(adv,rot,side)
 
 # ===================================================================
 # ===================================================================

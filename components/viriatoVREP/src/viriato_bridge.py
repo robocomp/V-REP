@@ -63,7 +63,7 @@ class ViriatoBridge(VREPClient):
                 
     def set_base_speed(self, adv, rot, side):
 
-        pass
+        retCode, oitInts, outFloats, outStrings, outBuffer = vrep.simxCallScriptFunction(self.client_id, "Viriato",  self.components['robot']['id'], "move_wheels", [],[adv, rot, side], [], [], vrep.simx_opmode_oneshot_wait)		
         #return res, err_list
 
     def set_speed_right(self, speed):
