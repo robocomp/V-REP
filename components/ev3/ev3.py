@@ -13,6 +13,8 @@ except:
 import sys
 from vrep_client import VREPClient
 import numpy as np
+from inputs import devices, get_gamepad
+import time
 
 __package__ = "Viriato"
 
@@ -40,9 +42,7 @@ class EV3(VREPClient):
             self.components[i] = {'name': j + self.suffix, 'id': None}
 
         for i in self.components.keys():
-            res, comp_id = vrep.simxGetObjectHandle(
-                self.client_id, self.components[i]['name'],
-                vrep.simx_opmode_oneshot_wait)
+            res, comp_id = vrep.simxGetObjectHandle(self.client_id, self.components[i]['name'],vrep.simx_opmode_oneshot_wait)
             if res == 0:
                 self.components[i]['id'] = comp_id
             elif res != 0 and self.debug:
@@ -50,24 +50,20 @@ class EV3(VREPClient):
                           self.components[i]['name'] + " ",
                           message=parse_error(res))
 
-    def set_new_objects(self, objects):
-        for i in objects:
-            res, comp_id = vrep.simxGetObjectHandle(
-                self.client_id, i, vrep.simx_opmode_oneshot_wait)
-            if res == 0:
-                self.objects[comp_id] = i
-    
     def stop_base(self):
         err_list = []
                 
     def set_base_speed(self, adv, rot):
         emptyBuff = bytearray()
-        retCode, outInts, outFloats, outStrings, outBuffer = vrep.simxCallScriptFunction(self.client_id, "Funciones",  vrep.sim_scripttype_childscript, "On", [adv, rot], [], [], emptyBuff, vrep.simx_opmode_blocking)		
+        retCode, outInts, outFloats, outStrings, outBuffer = vrep.simxCallScriptFunction(self.client_id, "Funciones",  vrep.sim_scripttype_childscript, "On", [], [adv, rot], [], emptyBuff, vrep.simx_opmode_blocking)		
         
     def get_sonar(self):
         emptyBuff = bytearray()
         retCode, outInts, outFloats, outStrings, outBuffer = vrep.simxCallScriptFunction(self.client_id, "Funciones",  vrep.sim_scripttype_childscript, "SensorSonar", [], [], [], emptyBuff, vrep.simx_opmode_blocking)		
-        return outFloats[0]
+        #res, sonar = vrep.simxGetObjectHandle(self.client_id, "mysonar", vrep.simx_opmode_oneshot_wait)
+        #retCode, state, point, handle, normal = vrep.simxReadProximitySensor(self.client_id, sonar, vrep.simx_opmode_oneshot_wait)
+        #print("sonar:", state, point)
+        return outFloats
 
     def get_light_sensor(self):
         emptyBuff = bytearray()
@@ -90,7 +86,7 @@ class EV3(VREPClient):
         return outInts[0]
 
     def get_base_pose(self):
-        res, pos = vrep.simxGetObjectPosition(self.client_id,self.components['robot']['id'],-1, vrep.simx_opmode_blocking)
+        res, pos = vrep.simxGetObjectPosition(self.client_id, self.components['robot']['id'],-1, vrep.simx_opmode_blocking)
         if res != 0:
             err_print("GET BASE POSE", parse_error(res))
             raise Exception("ERROR IN GET BASE POSE")
@@ -108,9 +104,32 @@ class EV3(VREPClient):
 if __name__ == "__main__":
     ev3 = EV3()
     #ev3.set_base_speed(0,0)
-    print(ev3.get_base_pose())
-    print("sonar:",ev3.get_sonar())
-    print("image:",ev3.get_light_sensor())
-    print("color:",ev3.get_color_sensor())
-    print("angular speed:",ev3.get_angular_speed())
-    print("angle:",ev3.get_angle())
+    adv = 0
+    rot = 0
+    MAX_ADV = 25 #mm/sg
+    MAX_ROT = 1  #rads/sg
+    start_time = time.time()
+    while(True):
+        elapsed_time = time.time() - start_time
+        if elapsed_time > 0.5:
+            print(ev3.get_base_pose())
+            print("sonar:",ev3.get_sonar())
+            print("image:",ev3.get_light_sensor())
+            print("color:",ev3.get_color_sensor())
+            print("angular speed:",ev3.get_angular_speed())
+            print("angle:",ev3.get_angle())
+            start_time = time.time()
+        event = get_gamepad()[0]
+        if event.code == "ABS_Y":
+            adv = -event.state*MAX_ADV*2/256 + MAX_ADV
+        elif event.code == "ABS_X":
+            rot = -event.state*MAX_ROT*2/256 + MAX_ROT
+        else:
+            continue
+        if abs(adv) > 0 or abs(rot) > 0:
+            #print(event.code, event.state, adv,rot)
+            ev3.set_base_speed(adv,rot)
+        
+            
+        
+            
