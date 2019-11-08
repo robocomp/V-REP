@@ -22,7 +22,7 @@ sudo ./vrep.sh
 ```
 
 The above command will start the V-REP simulation software.
-If you are not familiar with V-REP, follow our short [tutorial](https://github.com/robocomp/V-REP/blob/master/tutorial/V-REP_API.md) that cover general operational principles of the V-REP simulator or you can go through this awesome [tutorials](https://www.youtube.com/playlist?list=PL38P7Q24q4XA7c0uNj0kO4or-bKhFYdIg) on YouTube that covers the same.
+If you are not familiar with V-REP, follow our short [tutorial](https://github.com/robocomp/V-REP/blob/master/doc/V-REP_API.md) that cover general operational principles of the V-REP simulator or you can go through this awesome [tutorials](https://www.youtube.com/playlist?list=PL38P7Q24q4XA7c0uNj0kO4or-bKhFYdIg) on YouTube that covers the same.
 
 
 # Testing RoboComp.VREP Components
