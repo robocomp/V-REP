@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
@@ -55,7 +55,7 @@
 #
 #
 
-import sys, traceback, IceStorm, subprocess, threading, time, Queue, os, copy
+import sys, traceback, IceStorm, time, os, copy
 
 # Ctrl+c handling
 import signal
@@ -76,14 +76,14 @@ class CommonBehaviorI(RoboCompCommonBehavior.CommonBehavior):
 		try:
 			return self.handler.timeAwake()
 		except:
-			print 'Problem getting timeAwake'
+			print('Problem getting timeAwake')
 	def killYourSelf(self, current = None):
 		self.handler.killYourSelf()
 	def getAttrList(self, current = None):
 		try:
 			return self.handler.getAttrList()
 		except:
-			print 'Problem getting getAttrList'
+			print('Problem getting getAttrList')
 			traceback.print_exc()
 			status = 1
 			return
@@ -110,11 +110,11 @@ if __name__ == '__main__':
 		worker = SpecificWorker(mprx)
 		worker.setParams(parameters)
 	else:
-		print "Error getting required connections, check config file"
+		print("Error getting required connections, check config file")
 		sys.exit(-1)
 
-	adapter = ic.createObjectAdapter('CameraSimple')
-	adapter.add(CameraSimpleI(worker), ic.stringToIdentity('camerasimple'))
+	adapter = ic.createObjectAdapter('CameraRGBDSimple')
+	adapter.add(CameraRGBDSimpleI(worker), ic.stringToIdentity('camerargbdsimple'))
 	adapter.activate()
 
 

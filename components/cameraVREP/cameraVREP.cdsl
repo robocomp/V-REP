@@ -1,13 +1,11 @@
-import "CameraSimple.idsl";
+import "CameraRGBDSimple.idsl";
 
 Component cameraVREP
 {
     Communications
     {
-        implements CameraSimple;
+        implements CameraRGBDSimple;
     };
 	language python;
-	//options agmagent;
-	//options InnerModelViewer;
 };
 

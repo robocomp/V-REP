@@ -1,5 +1,5 @@
 # Endpoints for implemented interfaces
-CameraSimple.Endpoints=tcp -p 10178
+CameraRGBDSimple.Endpoints=tcp -p 10178
 
 
 
