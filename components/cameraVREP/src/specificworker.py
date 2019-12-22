@@ -24,12 +24,6 @@ import math
 import time
 import numpy as np
 
-# If RoboComp was compiled with Python bindings you can use InnerModel in Python
-# sys.path.append('/opt/robocomp/lib')
-# import librobocomp_qmat
-# import librobocomp_osgviewer
-# import librobocomp_innermodel
-
 class SpecificWorker(GenericWorker):
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
@@ -38,19 +32,22 @@ class SpecificWorker(GenericWorker):
 			print('Connected to remote API server')
 			mode = vrep.simx_opmode_blocking
 			#res, camhandle = vrep.simxGetObjectHandle(clientID, 'ePuck_lightSensor', vrep.simx_opmode_oneshot_wait)
-			res, camhandle = vrep.simxGetObjectHandle(clientID, 'camera_1_rgb', vrep.simx_opmode_oneshot_wait)
-			res, camDhandle = vrep.simxGetObjectHandle(clientID, 'camera_1_depth', vrep.simx_opmode_oneshot_wait)
-			res, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
+			res, self.camhandle = vrep.simxGetObjectHandle(clientID, 'camera_1_rgb', vrep.simx_opmode_oneshot_wait)
+			res, camDhandle = vrep.simxGetObjectHandle(clientID, 'camera_1_depth', vrep.simx_opmode_streaming)
+			res, resolution, image = vrep.simxGetVisionSensorImage(clientID, self.camhandle, 0, vrep.simx_opmode_oneshot)
 			resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(clientID, camDhandle, vrep.simx_opmode_streaming)
+
+		if self.camhandle < 0:
+			sys.exit()
+		#self.camhandle = camhandle
+		self.camDhandle = camDhandle
+		self.clientID = clientID
 
 		self.timer.timeout.connect(self.compute)
 		self.Period = 50
 		self.timer.start(self.Period)
 		
-		self.camhandle = camhandle
-		self.camDhandle = camDhandle
-		self.clientID = clientID
-
+		
 	def __del__(self):
 		print('SpecificWorker destructor')
 
@@ -59,13 +56,17 @@ class SpecificWorker(GenericWorker):
 
 	@QtCore.Slot()
 	def compute(self):
-		res, resolution, image = vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_buffer)
+		res, resolution, image = vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_oneshot_wait)
+		if res is not 0:
+			sys.exit()
 		img = np.array(image, dtype = np.uint8)
 		img.resize([resolution[1], resolution[0], 3])
-		img = cv2.resize(img, (0, 0), None, .5, .5)
+		#img = cv2.resize(img, (0, 0), None, .5, .5)
 		img = cv2.flip(img, 0)
-		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-		resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(self.clientID, self.camDhandle, vrep.simx_opmode_buffer)
+		self.image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+		#print(len(img.flatten()))
+
+		#resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(self.clientID, self.camDhandle, vrep.simx_opmode_buffer)
 		
 		# imgD = np.array(depth, dtype = np.float32)
 		# imgD.resize([resolutionD[1], resolutionD[0], 1])
@@ -78,14 +79,14 @@ class SpecificWorker(GenericWorker):
 		# horizontal_concat = np.concatenate((img, imgDD), axis=1)
 
 		#cv2.imshow("ALab_CameraD_0", horizontal_concat)
-		cv2.imshow("ALab_CameraD_0", img)
+		
+		cv2.imshow("ALab_CameraD_0", self.image)
 		
 	
 		return True
 
 # =============== Methods for Component Implements ==================
 # ===================================================================
-
 	#
 	# getAll
 	#
@@ -96,7 +97,6 @@ class SpecificWorker(GenericWorker):
 		im = TImage()
 		dep = TDepth()
 		return [im, dep]
-
 
 	#
 	# getDepth
@@ -116,15 +116,10 @@ class SpecificWorker(GenericWorker):
 	# getImage
 	#
 	def getImage(self):
-		res, resolution, image = vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_buffer)
-		img = np.array(image, dtype = np.uint8)
-		img.resize([resolution[1], resolution[0], 3])
-		img = cv2.flip(img, 0)
-		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-		# #
+		
 		im = TImage()
-		im.image = img.data
-		im.width, im.height, im.depth = img.shape
+		im.image = self.image.flatten()
+		im.width, im.height, im.depth = self.image.shape
 		return im
 
 # ===================================================================
