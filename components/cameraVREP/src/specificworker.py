@@ -27,15 +27,15 @@ import numpy as np
 class SpecificWorker(GenericWorker):
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
-		clientID = vrep.simxStart('127.0.0.1',19997,True,True,5000,5)
+		clientID = vrep.simxStart('127.0.0.1',19999,True,True,5000,5)
 		if clientID != -1:
 			print('Connected to remote API server')
 			mode = vrep.simx_opmode_blocking
 			#res, camhandle = vrep.simxGetObjectHandle(clientID, 'ePuck_lightSensor', vrep.simx_opmode_oneshot_wait)
-			res, self.camhandle = vrep.simxGetObjectHandle(clientID, 'camera_1_rgb', vrep.simx_opmode_oneshot_wait)
-			res, camDhandle = vrep.simxGetObjectHandle(clientID, 'camera_1_depth', vrep.simx_opmode_streaming)
-			res, resolution, image = vrep.simxGetVisionSensorImage(clientID, self.camhandle, 0, vrep.simx_opmode_oneshot)
-			resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(clientID, camDhandle, vrep.simx_opmode_streaming)
+			res, self.camhandle = vrep.simxGetObjectHandle(clientID, 'camera_2_rgb', vrep.simx_opmode_oneshot_wait)
+			res, camDhandle = vrep.simxGetObjectHandle(clientID, 'camera_2_depth', vrep.simx_opmode_oneshot_wait)
+			res, resolution, image = vrep.simxGetVisionSensorImage(clientID, self.camhandle, 0, vrep.simx_opmode_oneshot_wait)
+			resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(clientID, camDhandle, vrep.simx_opmode_oneshot_wait)
 
 		if self.camhandle < 0:
 			sys.exit()
@@ -56,12 +56,12 @@ class SpecificWorker(GenericWorker):
 
 	@QtCore.Slot()
 	def compute(self):
+		
 		res, resolution, image = vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_oneshot_wait)
 		if res is not 0:
 			sys.exit()
 		img = np.array(image, dtype = np.uint8)
 		img.resize([resolution[1], resolution[0], 3])
-		#img = cv2.resize(img, (0, 0), None, .5, .5)
 		img = cv2.flip(img, 0)
 		self.image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 		#print(len(img.flatten()))
@@ -85,7 +85,7 @@ class SpecificWorker(GenericWorker):
 	
 		return True
 
-# =============== Methods for Component Implements ==================
+# =============== STUB ==============================================
 # ===================================================================
 	#
 	# getAll
@@ -116,10 +116,10 @@ class SpecificWorker(GenericWorker):
 	# getImage
 	#
 	def getImage(self):
-		
 		im = TImage()
 		im.image = self.image.flatten()
 		im.width, im.height, im.depth = self.image.shape
+		print("returning image", self.image.shape)
 		return im
 
 # ===================================================================
