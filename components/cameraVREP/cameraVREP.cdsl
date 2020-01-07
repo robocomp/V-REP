@@ -1,10 +1,14 @@
 import "CameraRGBDSimple.idsl";
+import "CameraRGBDSimplePub.idsl";
+import "AprilTagsServer.idsl";
 
 Component cameraVREP
 {
     Communications
     {
+        requires AprilTagsServer;
         implements CameraRGBDSimple;
+        publishes CameraRGBDSimplePub;
     };
 	language python;
 };

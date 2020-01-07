@@ -106,6 +106,51 @@ if __name__ == '__main__':
 	parameters = {}
 	for i in ic.getProperties():
 		parameters[str(i)] = str(ic.getProperties().getProperty(i))
+
+	# Topic Manager
+	proxy = ic.getProperties().getProperty("TopicManager.Proxy")
+	obj = ic.stringToProxy(proxy)
+	try:
+		topicManager = IceStorm.TopicManagerPrx.checkedCast(obj)
+	except Ice.ConnectionRefusedException as e:
+		print('Cannot connect to IceStorm! ('+proxy+')')
+		status = 1
+
+	# Remote object connection for AprilTagsServer
+	try:
+		proxyString = ic.getProperties().getProperty('AprilTagsServerProxy')
+		try:
+			basePrx = ic.stringToProxy(proxyString)
+			apriltagsserver_proxy = AprilTagsServerPrx.checkedCast(basePrx)
+			mprx["AprilTagsServerProxy"] = apriltagsserver_proxy
+		except Ice.Exception:
+			print('Cannot connect to the remote object (AprilTagsServer)', proxyString)
+			#traceback.print_exc()
+			status = 1
+	except Ice.Exception as e:
+		print(e)
+		print('Cannot get AprilTagsServerProxy property.')
+		status = 1
+
+
+	# Create a proxy to publish a CameraRGBDSimplePub topic
+	topic = False
+	try:
+		topic = topicManager.retrieve("CameraRGBDSimplePub")
+	except:
+		pass
+	while not topic:
+		try:
+			topic = topicManager.retrieve("CameraRGBDSimplePub")
+		except IceStorm.NoSuchTopic:
+			try:
+				topic = topicManager.create("CameraRGBDSimplePub")
+			except:
+				print('Another client created the CameraRGBDSimplePub topic? ...')
+	pub = topic.getPublisher().ice_oneway()
+	camerargbdsimplepubTopic = CameraRGBDSimplePubPrx.uncheckedCast(pub)
+	mprx["CameraRGBDSimplePubPub"] = camerargbdsimplepubTopic
+
 	if status == 0:
 		worker = SpecificWorker(mprx)
 		worker.setParams(parameters)

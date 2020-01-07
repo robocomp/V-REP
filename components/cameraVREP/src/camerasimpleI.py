@@ -41,6 +41,34 @@ except:
 	print('SLICE_PATH environment variable was not exported. Using only the default paths')
 	pass
 
+ice_CameraRGBDSimple = False
+for p in icePaths:
+	print('Trying', p, 'to load CameraRGBDSimple.ice')
+	if os.path.isfile(p+'/CameraRGBDSimple.ice'):
+		print('Using', p, 'to load CameraRGBDSimple.ice')
+		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
+		wholeStr = preStr+"CameraRGBDSimple.ice"
+		Ice.loadSlice(wholeStr)
+		ice_CameraRGBDSimple = True
+		break
+if not ice_CameraRGBDSimple:
+	print('Couldn\'t load CameraRGBDSimple')
+	sys.exit(-1)
+from RoboCompCameraRGBDSimple import *
+ice_CameraRGBDSimplePub = False
+for p in icePaths:
+	print('Trying', p, 'to load CameraRGBDSimplePub.ice')
+	if os.path.isfile(p+'/CameraRGBDSimplePub.ice'):
+		print('Using', p, 'to load CameraRGBDSimplePub.ice')
+		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
+		wholeStr = preStr+"CameraRGBDSimplePub.ice"
+		Ice.loadSlice(wholeStr)
+		ice_CameraRGBDSimplePub = True
+		break
+if not ice_CameraRGBDSimplePub:
+	print('Couldn\'t load CameraRGBDSimplePub')
+	sys.exit(-1)
+from RoboCompCameraRGBDSimplePub import *
 ice_CameraSimple = False
 for p in icePaths:
 	print('Trying', p, 'to load CameraSimple.ice')
