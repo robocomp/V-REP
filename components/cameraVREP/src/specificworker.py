@@ -76,7 +76,7 @@ class SpecificWorker(GenericWorker):
 		self.t_image.width = resolution[1]
 		self.t_image.height = resolution[0]
 		self.t_image.depth = 3
-		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
+#		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
 		
 		if self.display:
 			img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
@@ -86,15 +86,15 @@ class SpecificWorker(GenericWorker):
 			try:
 				frame = Image()
 				frame.data = img.flatten()
-				frame.format = Format(Mode.RGB888Packet, 320, 240, 3)
+				frame.frmt = Format(Mode.RGB888Packet, resolution[1], resolution[0], 3)
 				frame.timeStamp = time.time()
-				tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=700, mfx=400, mfy=400);
-				print(tags_list)
+				tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
+				print(frame.timeStamp, tags_list)
 			except Ice.Exception as ex:
 				print(ex)
-
+			cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
 			cv2.imshow("ALab_Camera_" + str(self.cameraid), img)
-		
+			cv2.waitKey(1)
 		return True
 
 # =============== STUB ==============================================
