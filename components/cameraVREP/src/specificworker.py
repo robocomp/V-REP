@@ -79,18 +79,18 @@ class SpecificWorker(GenericWorker):
 		self.t_image.depth = 3
 #		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
 
-		# try:
-		# 	frame = Image()
-		# 	#frame.data = img.flatten()
-		# 	frame.data = image
-		# 	frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
-		# 	frame.timeStamp = time.time()
-		# 	#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
-		# 	tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=382, mfy=266);
-		# 	dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
-		# 	print(frame.timeStamp, tags_list,dist)
-		# except Ice.Exception as ex:
-		# 	print(ex)
+		try:
+			frame = Image()
+			#frame.data = img.flatten()
+			frame.data = image
+			frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
+			frame.timeStamp = time.time()
+			#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
+			tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=382, mfy=266);
+			dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
+			print(frame.timeStamp, tags_list,dist)
+		except Ice.Exception as ex:
+			print(ex)
 
 		if self.display:
 			img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
