@@ -67,6 +67,7 @@ class SpecificWorker(GenericWorker):
 	@QtCore.Slot()
 	def compute(self):
 		
+		ml = QMutexLocker(self.mutex)
 		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
 		if not res:
 			return
@@ -77,21 +78,24 @@ class SpecificWorker(GenericWorker):
 		self.t_image.height = resolution[0]
 		self.t_image.depth = 3
 #		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
-		
+
+		# try:
+		# 	frame = Image()
+		# 	#frame.data = img.flatten()
+		# 	frame.data = image
+		# 	frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
+		# 	frame.timeStamp = time.time()
+		# 	#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
+		# 	tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=382, mfy=266);
+		# 	dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
+		# 	print(frame.timeStamp, tags_list,dist)
+		# except Ice.Exception as ex:
+		# 	print(ex)
+
 		if self.display:
 			img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
 			img = cv2.flip(img, 0)
 			img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-			
-			try:
-				frame = Image()
-				frame.data = img.flatten()
-				frame.frmt = Format(Mode.RGB888Packet, resolution[1], resolution[0], 3)
-				frame.timeStamp = time.time()
-				tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
-				print(frame.timeStamp, tags_list)
-			except Ice.Exception as ex:
-				print(ex)
 			cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
 			cv2.imshow("ALab_Camera_" + str(self.cameraid), img)
 			cv2.waitKey(1)
@@ -102,14 +106,14 @@ class SpecificWorker(GenericWorker):
 	#
 	# getImage
 	#
-	def getImage(self):
-		#ml = QMutexLocker(self.mutex)
+	def CameraRGBDSimple_getImage(self):
+		ml = QMutexLocker(self.mutex)
 		print("returning image", self.t_image.width, self.t_image.height, self.t_image.depth)
 		return self.t_image
 	#
 	# getAll
 	#
-	def getAll(self):
+	def CameraRGBDSimple_getAll(self):
 		#
 		# implementCODE
 		#
@@ -120,7 +124,7 @@ class SpecificWorker(GenericWorker):
 	#
 	# getDepth
 	#
-	def getDepth(self):
+	def CameraRGBDSimple_getDepth(self):
 		resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(self.clientID, self.camDhandle, vrep.simx_opmode_buffer)
 		imgD = np.array(depth, dtype = np.float32)
 		imgD.resize([resolutionD[1], resolutionD[0], 1])
