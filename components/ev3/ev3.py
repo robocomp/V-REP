@@ -60,9 +60,6 @@ class EV3(VREPClient):
     def get_sonar(self):
         emptyBuff = bytearray()
         retCode, outInts, outFloats, outStrings, outBuffer = vrep.simxCallScriptFunction(self.client_id, "Funciones",  vrep.sim_scripttype_childscript, "SensorSonar", [], [], [], emptyBuff, vrep.simx_opmode_blocking)		
-        #res, sonar = vrep.simxGetObjectHandle(self.client_id, "mysonar", vrep.simx_opmode_oneshot_wait)
-        #retCode, state, point, handle, normal = vrep.simxReadProximitySensor(self.client_id, sonar, vrep.simx_opmode_oneshot_wait)
-        #print("sonar:", state, point)
         return outFloats
 
     def get_light_sensor(self):

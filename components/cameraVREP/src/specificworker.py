@@ -29,22 +29,6 @@ import b0RemoteApi
 class SpecificWorker(GenericWorker):
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
-		
-		# clientID = vrep.simxStart('127.0.0.1',19999,True,True,5000,5)
-		# if clientID != -1:
-		# 	print('Connected to remote API server')
-		# 	mode = vrep.simx_opmode_blocking
-		# 	#res, camhandle = vrep.simxGetObjectHandle(clientID, 'ePuck_lightSensor', vrep.simx_opmode_oneshot_wait)
-		# 	res, self.camhandle = vrep.simxGetObjectHandle(clientID, 'camera_2_rgb', vrep.simx_opmode_oneshot_wait)
-		# 	res, camDhandle = vrep.simxGetObjectHandle(clientID, 'camera_2_depth', vrep.simx_opmode_oneshot_wait)
-		# 	res, resolution, image = vrep.simxGetVisionSensorImage(clientID, self.camhandle, 0, vrep.simx_opmode_oneshot_wait)
-		# 	resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(clientID, camDhandle, vrep.simx_opmode_oneshot_wait)
-
-		# if self.camhandle < 0:
-		# 	sys.exit()
-		# #self.camhandle = camhandle
-		# self.camDhandle = camDhandle
-		# self.clientID = clientID
 
 		self.timer.timeout.connect(self.compute)
 		self.Period = 50
@@ -67,8 +51,11 @@ class SpecificWorker(GenericWorker):
 	@QtCore.Slot()
 	def compute(self):
 		
-		ml = QMutexLocker(self.mutex)
+		print("compute")
+		#ml = QMutexLocker(self.mutex)
 		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
+		depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
+
 		if not res:
 			return
 
@@ -79,18 +66,21 @@ class SpecificWorker(GenericWorker):
 		self.t_image.depth = 3
 #		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
 
-		try:
-			frame = Image()
-			#frame.data = img.flatten()
-			frame.data = image
-			frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
-			frame.timeStamp = time.time()
-			#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
-			tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=382, mfy=266);
-			dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
-			print(frame.timeStamp, tags_list,dist)
-		except Ice.Exception as ex:
-			print(ex)
+		# try:
+		# 	frame = Image()
+		# 	#frame.data = img.flatten()
+		# 	frame.data = image
+		# 	frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
+		# 	frame.timeStamp = time.time()
+		# 	#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
+		# 	tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=374, mfy=374);
+		# 	if len(tags_list) > 0:
+		# 		dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
+		# 	else:
+		# 		dist = 0
+		# 	print(frame.timeStamp, tags_list,dist)
+		# except Ice.Exception as ex:
+		# 	print(ex)
 
 		if self.display:
 			img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
