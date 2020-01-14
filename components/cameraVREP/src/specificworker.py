@@ -30,6 +30,7 @@ class SpecificWorker(GenericWorker):
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
 
+		self.t_image = TImage()
 		self.timer.timeout.connect(self.compute)
 		self.Period = 50
 		self.timer.start(self.Period)
@@ -51,7 +52,7 @@ class SpecificWorker(GenericWorker):
 	@QtCore.Slot()
 	def compute(self):
 		
-		print("compute")
+		#print("compute")
 		#ml = QMutexLocker(self.mutex)
 		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
 		depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
@@ -59,7 +60,6 @@ class SpecificWorker(GenericWorker):
 		if not res:
 			return
 
-		self.t_image = TImage()
 		self.t_image.image = image
 		self.t_image.width = resolution[0]
 		self.t_image.height = resolution[1]
@@ -71,21 +71,21 @@ class SpecificWorker(GenericWorker):
 		self.t_depth.height = resolution[1]
 #		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
 
-		# try:
-		# 	frame = Image()
-		# 	#frame.data = img.flatten()
-		# 	frame.data = image
-		# 	frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
-		# 	frame.timeStamp = time.time()
-		# 	#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=462, mfy=346);
-		# 	tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=374, mfy=374);
-		# 	if len(tags_list) > 0:
-		# 		dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
-		# 	else:
-		# 		dist = 0
-		# 	print(frame.timeStamp, tags_list,dist)
-		# except Ice.Exception as ex:
-		# 	print(ex)
+		try:
+			frame = Image()
+			#frame.data = img.flatten()
+			frame.data = image
+			frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
+			frame.timeStamp = time.time()
+			tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=280, mfx=462, mfy=462);
+			#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=374, mfy=374);
+			if len(tags_list) > 0:
+				dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
+			else:
+				dist = 0
+			print(frame.timeStamp, tags_list,dist)
+		except Ice.Exception as ex:
+			print(ex)
 
 		if self.display:
 			img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
@@ -102,8 +102,8 @@ class SpecificWorker(GenericWorker):
 	# getImage
 	#
 	def CameraRGBDSimple_getImage(self):
-		ml = QMutexLocker(self.mutex)
-		print("returning image", self.t_image.width, self.t_image.height, self.t_image.depth)
+		#ml = QMutexLocker(self.mutex)
+		#print("returning image", self.t_image.width, self.t_image.height, self.t_image.depth)
 		return self.t_image
 	#
 	# getAll
