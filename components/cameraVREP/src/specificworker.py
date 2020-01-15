@@ -35,6 +35,7 @@ class SpecificWorker(GenericWorker):
 		self.timer.timeout.connect(self.compute)
 		self.Period = 50
 		self.timer.start(self.Period)
+		self.contFPS = 0
 
 
 	def __del__(self):
@@ -50,17 +51,13 @@ class SpecificWorker(GenericWorker):
 	def initialize(self):
 		self.client = b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient','b0RemoteApiAddOn')
 		self.wall_camera = self.client.simxGetObjectHandle('camera_' + str(self.cameraid) + '_rgb',self.client.simxServiceCall())
-		
+		self.start = time.time()
+
 	@QtCore.Slot()
 	def compute(self):
-		#res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
-		#depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
-
-		self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
-		self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
-		
-		return
-
+		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
+		depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
+	
 		if not res:
 			return
 
@@ -72,6 +69,7 @@ class SpecificWorker(GenericWorker):
 		self.t_depth.depth = depth
 		self.t_depth.width = resolution[0]
 		self.t_depth.height = resolution[1]
+
 #		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
 
 		if self.callapriltags:
@@ -89,6 +87,11 @@ class SpecificWorker(GenericWorker):
 		cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
 		cv2.imshow("ALab_Camera_" + str(self.cameraid), img)
 		cv2.waitKey(1)
+		if time.time() - self.start() > 1:
+			print("FPS:", cont)
+			self.start = time.time()
+			self.contFPS = 0
+		self.contFPS += 1
 	
 	def getAprilTags(self, image, resolution):
 		try:

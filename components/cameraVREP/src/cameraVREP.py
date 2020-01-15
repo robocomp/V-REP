@@ -122,7 +122,6 @@ if __name__ == '__main__':
 		try:
 			basePrx = ic.stringToProxy(proxyString)
 			apriltagsserver_proxy = AprilTagsServerPrx.uncheckedCast(basePrx)
-			
 			mprx["AprilTagsServerProxy"] = apriltagsserver_proxy
 		except Ice.Exception:
 			print('Cannot connect to the remote object (AprilTagsServer)', proxyString)

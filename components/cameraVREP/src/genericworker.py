@@ -56,18 +56,6 @@ if not ice_AprilTagsServer:
 	print('Couln\'t load AprilTagsServer')
 	sys.exit(-1)
 from RoboCompAprilTagsServer import *
-ice_CameraRGBDSimple = False
-for p in icePaths:
-	if os.path.isfile(p+'/CameraRGBDSimple.ice'):
-		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"CameraRGBDSimple.ice"
-		Ice.loadSlice(wholeStr)
-		ice_CameraRGBDSimple = True
-		break
-if not ice_CameraRGBDSimple:
-	print('Couln\'t load CameraRGBDSimple')
-	sys.exit(-1)
-from RoboCompCameraRGBDSimple import *
 ice_CameraRGBDSimplePub = False
 for p in icePaths:
 	if os.path.isfile(p+'/CameraRGBDSimplePub.ice'):
@@ -80,6 +68,18 @@ if not ice_CameraRGBDSimplePub:
 	print('Couln\'t load CameraRGBDSimplePub')
 	sys.exit(-1)
 from RoboCompCameraRGBDSimplePub import *
+ice_CameraRGBDSimple = False
+for p in icePaths:
+	if os.path.isfile(p+'/CameraRGBDSimple.ice'):
+		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
+		wholeStr = preStr+"CameraRGBDSimple.ice"
+		Ice.loadSlice(wholeStr)
+		ice_CameraRGBDSimple = True
+		break
+if not ice_CameraRGBDSimple:
+	print('Couln\'t load CameraRGBDSimple')
+	sys.exit(-1)
+from RoboCompCameraRGBDSimple import *
 
 
 from camerargbdsimpleI import *
