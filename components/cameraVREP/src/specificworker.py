@@ -42,6 +42,7 @@ class SpecificWorker(GenericWorker):
 	def setParams(self, params):
 		self.cameraid = int(params["cameraid"])  # range must be controlled 1..MAX_CAMERAS
 		self.display = "true" in params["display"]
+		self.callapriltags = "true" in params["callapriltags"]
 		self.initialize()
 		return True
 
@@ -51,9 +52,6 @@ class SpecificWorker(GenericWorker):
 
 	@QtCore.Slot()
 	def compute(self):
-		
-		#print("compute")
-		#ml = QMutexLocker(self.mutex)
 		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
 		depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
 
@@ -66,14 +64,31 @@ class SpecificWorker(GenericWorker):
 		self.t_image.depth = 3
 #		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
 
+		if self.callapriltags:
+			self.getAprilTags(image, resolution)
+		
+		if self.display:
+			self.displayImage(image, resolution)
+
+		return True
+
+	def displayImage(self, image, resolution):
+		img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
+		img = cv2.flip(img, 0)
+		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+		cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
+		cv2.imshow("ALab_Camera_" + str(self.cameraid), img)
+		cv2.waitKey(1)
+	
+	def getAprilTags(self, image, resolution):
 		try:
 			frame = Image()
 			#frame.data = img.flatten()
 			frame.data = image
 			frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
 			frame.timeStamp = time.time()
+			# 280 porque es la parte de negro que ocupa todo el png
 			tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=280, mfx=462, mfy=462);
-			#tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=350, mfx=374, mfy=374);
 			if len(tags_list) > 0:
 				dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
 			else:
@@ -81,15 +96,6 @@ class SpecificWorker(GenericWorker):
 			print(frame.timeStamp, tags_list,dist)
 		except Ice.Exception as ex:
 			print(ex)
-
-		if self.display:
-			img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
-			img = cv2.flip(img, 0)
-			img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-			cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
-			cv2.imshow("ALab_Camera_" + str(self.cameraid), img)
-			cv2.waitKey(1)
-		return True
 
 # =============== STUB ==============================================
 # ===================================================================
