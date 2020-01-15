@@ -59,9 +59,14 @@ class SpecificWorker(GenericWorker):
 			return
 
 		self.t_image.image = image
-		self.t_image.width = resolution[1]
-		self.t_image.height = resolution[0]
+		self.t_image.width = resolution[0]
+		self.t_image.height = resolution[1]
 		self.t_image.depth = 3
+		
+		self.t_depth = TDepth()
+		self.t_depth.depth = depth
+		self.t_depth.width = resolution[0]
+		self.t_depth.height = resolution[1]
 #		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
 
 		if self.callapriltags:
@@ -110,26 +115,13 @@ class SpecificWorker(GenericWorker):
 	# getAll
 	#
 	def CameraRGBDSimple_getAll(self):
-		#
-		# implementCODE
-		#
-		im = TImage()
-		dep = TDepth()
-		return [im, dep]
+		return (self.t_image, self.t_depth)
 
 	#
 	# getDepth
 	#
 	def CameraRGBDSimple_getDepth(self):
-		resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(self.clientID, self.camDhandle, vrep.simx_opmode_buffer)
-		imgD = np.array(depth, dtype = np.float32)
-		imgD.resize([resolutionD[1], resolutionD[0], 1])
-		imgD = cv2.flip(imgD, 0)
-		#
-		dep = TDepth()
-		dep.image = dep.data
-		dep.width, dep.height = img.shape[:2]
-		return dep
+		return self.t_depth
 
 # ===================================================================
 # ===================================================================
