@@ -29,6 +29,7 @@
 
 #include <genericworker.h>
 #include <innermodel/innermodel.h>
+#include "b0RemoteApi.h"
 
 class SpecificWorker : public GenericWorker
 {
