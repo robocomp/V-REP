@@ -42,6 +42,7 @@ class SpecificWorker(GenericWorker):
 		print('SpecificWorker destructor')
 
 	def setParams(self, params):
+		print("Reading params")
 		self.cameraid = int(params["cameraid"])  # range must be controlled 1..MAX_CAMERAS
 		self.display = "true" in params["display"]
 		self.callapriltags = "true" in params["callapriltags"]
@@ -49,6 +50,7 @@ class SpecificWorker(GenericWorker):
 		return True
 
 	def initialize(self):
+		print("Initialize")
 		self.client = b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient','b0RemoteApiAddOn')
 		self.wall_camera = self.client.simxGetObjectHandle('camera_' + str(self.cameraid) + '_rgb',self.client.simxServiceCall())
 		self.start = time.time()
@@ -87,7 +89,7 @@ class SpecificWorker(GenericWorker):
 		cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
 		cv2.imshow("ALab_Camera_" + str(self.cameraid), img)
 		cv2.waitKey(1)
-		if time.time() - self.start() > 1:
+		if time.time() - self.start > 1:
 			print("FPS:", cont)
 			self.start = time.time()
 			self.contFPS = 0
