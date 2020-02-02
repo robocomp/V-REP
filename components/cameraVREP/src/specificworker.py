@@ -53,6 +53,7 @@ class SpecificWorker(GenericWorker):
 		print("Initialize")
 		self.client = b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient','b0RemoteApiAddOn')
 		self.wall_camera = self.client.simxGetObjectHandle('camera_' + str(self.cameraid) + '_rgb',self.client.simxServiceCall())
+		#self.bill = self.client.simxGetObjectHandle('Bill_base#1', self.client.simxServiceCall())
 		self.start = time.time()
 
 	@QtCore.Slot()
@@ -60,6 +61,11 @@ class SpecificWorker(GenericWorker):
 		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
 		depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
 	
+		# success, bill_pos = self.client.simxGetObjectPosition(self.bill[1], -1, self.client.simxServiceCall())
+		# print("pos", bill_pos)
+		# success, bill_ori = self.client.simxGetObjectOrientation(self.bill[1], -1, self.client.simxServiceCall())
+		# print("ori", bill_ori)
+		
 		if not res:
 			return
 
