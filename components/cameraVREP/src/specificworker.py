@@ -52,7 +52,8 @@ class SpecificWorker(GenericWorker):
 	def initialize(self):
 		print("Initialize")
 		self.client = b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient','b0RemoteApiAddOn')
-		self.wall_camera = self.client.simxGetObjectHandle('camera_' + str(self.cameraid) + '_rgb',self.client.simxServiceCall())
+		#self.wall_camera = self.client.simxGetObjectHandle('camera_' + str(self.cameraid) + '_rgb',self.client.simxServiceCall())
+		self.wall_camera = self.client.simxGetObjectHandle('Camera_Arm', self.client.simxServiceCall())
 		#self.bill = self.client.simxGetObjectHandle('Bill_base#1', self.client.simxServiceCall())
 		self.start = time.time()
 
@@ -93,10 +94,10 @@ class SpecificWorker(GenericWorker):
 		img = cv2.flip(img, 0)
 		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 		cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
-		cv2.imshow("ALab_Camera_" + str(self.cameraid), img)
+		cv2.imshow("Camera_" + str(self.cameraid), img)
 		cv2.waitKey(1)
 		if time.time() - self.start > 1:
-			print("FPS:", cont)
+			print("FPS:", self.contFPS)
 			self.start = time.time()
 			self.contFPS = 0
 		self.contFPS += 1

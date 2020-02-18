@@ -1,0 +1,10 @@
+
+Component gen3kinova
+{
+    Communications
+    {
+    };
+	language python;
+	statemachine "statemachine.smdsl";
+};
+
