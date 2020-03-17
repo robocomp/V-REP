@@ -3,7 +3,7 @@
 SET ( SOURCES
   specificworker.cpp
   specificmonitor.cpp
-  b0RemoteApi.cpp
+  /home/robocomp/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/b0RemoteApiBindings/cpp/b0RemoteApi.cpp
 )
 
 # Headers set
@@ -12,7 +12,7 @@ SET ( HEADERS
   specificmonitor.h
 )
 
-include_directories("/home/pbustos/Software/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/programming/b0RemoteApiBindings/cpp/msgpack-c/include/", "/home/robocomp/software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/blueZero/include/b0/bindings/")
+
 set(CMAKE_CXX_STANDARD 17)
 
-SET (LIBS ${LIBS}  )
+SET (LIBS ${LIBS} b0 )

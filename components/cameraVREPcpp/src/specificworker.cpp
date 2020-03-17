@@ -59,7 +59,7 @@ void SpecificWorker::initialize(int period)
 	std::cout << "Initialize worker" << std::endl;
 
  	b0RemoteApi client("b0RemoteApi_c++Client","b0RemoteApi");
-    cl=&client;
+    auto cl=&client;
 
 	this->Period = period;
 	timer.start(Period);

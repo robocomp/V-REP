@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
-PROJECT( cameraVREPcpp )
 
+project(cameraVREPcpp)
 
 IF ( "$ENV{ROBOCOMP}" STREQUAL "")
   MESSAGE(WARNING "ROBOCOMP variable not set. Using the default value: /opt/robocomp")
@@ -41,5 +41,7 @@ SET (EXECUTABLE_OUTPUT_PATH ${RC_COMPONENT_DEVEL_PATH}/bin)
 
 # Specify construction and link process
 ADD_EXECUTABLE( cameraVREPcpp ${SOURCES} ${MOC_SOURCES} ${RC_SOURCES} ${UI_HEADERS} )
+target_include_directories(cameraVREPcpp PRIVATE /home/robocomp/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/b0RemoteApiBindings/cpp/msgpack-c/include/ /home/robocomp/software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/bluezero/include/b0/bindings/ /home/robocomp/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/b0RemoteApiBindings/cpp/)
+
 TARGET_LINK_LIBRARIES( cameraVREPcpp ${LIBS} ${STATIC_LIBS} ${SPECIFIC_LIBS} ${QT_LIBRARIES} ${Ice_LIBRARIES})
 INSTALL(FILES ${EXECUTABLE_OUTPUT_PATH}/cameraVREPcpp DESTINATION ${RC_COMPONENT_INSTALL_PATH}/bin/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE )
