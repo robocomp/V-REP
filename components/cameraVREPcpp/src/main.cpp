@@ -131,26 +131,9 @@ int ::cameraVREPcpp::run(int argc, char* argv[])
 	int status=EXIT_SUCCESS;
 
 	CameraRGBDSimplePubPrxPtr camerargbdsimplepub_pubproxy;
-	AprilTagsServerPrxPtr apriltagsserver_proxy;
 
 	string proxy, tmp;
 	initialize();
-
-
-	try
-	{
-		if (not GenericMonitor::configGetString(communicator(), prefix, "AprilTagsServerProxy", proxy, ""))
-		{
-			cout << "[" << PROGRAM_NAME << "]: Can't read configuration for proxy AprilTagsServerProxy\n";
-		}
-		apriltagsserver_proxy = Ice::uncheckedCast<AprilTagsServerPrx>( communicator()->stringToProxy( proxy ) );
-	}
-	catch(const Ice::Exception& ex)
-	{
-		cout << "[" << PROGRAM_NAME << "]: Exception creating proxy AprilTagsServer: " << ex;
-		return EXIT_FAILURE;
-	}
-	rInfo("AprilTagsServerProxy initialized Ok!");
 
 	IceStorm::TopicManagerPrxPtr topicManager;
 	try
@@ -187,7 +170,7 @@ int ::cameraVREPcpp::run(int argc, char* argv[])
 	auto camerargbdsimplepub_pub = camerargbdsimplepub_topic->getPublisher()->ice_oneway();
 	camerargbdsimplepub_pubproxy = Ice::uncheckedCast<CameraRGBDSimplePubPrx>(camerargbdsimplepub_pub);
 
-	tprx = std::make_tuple(apriltagsserver_proxy,camerargbdsimplepub_pubproxy);
+	tprx = std::make_tuple(camerargbdsimplepub_pubproxy);
 	SpecificWorker *worker = new SpecificWorker(tprx);
 	//Monitor thread
 	SpecificMonitor *monitor = new SpecificMonitor(worker,communicator());

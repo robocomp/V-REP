@@ -26,7 +26,6 @@
 #include <CommonBehavior.h>
 
 #include <CameraRGBDSimple.h>
-#include <AprilTagsServer.h>
 #include <CameraRGBDSimplePub.h>
 
 
@@ -35,10 +34,9 @@
 
 using namespace std;
 using namespace RoboCompCameraRGBDSimple;
-using namespace RoboCompAprilTagsServer;
 using namespace RoboCompCameraRGBDSimplePub;
 
-using TuplePrx = std::tuple<RoboCompAprilTagsServer::AprilTagsServerPrxPtr,RoboCompCameraRGBDSimplePub::CameraRGBDSimplePubPrxPtr>;
+using TuplePrx = std::tuple<RoboCompCameraRGBDSimplePub::CameraRGBDSimplePubPrxPtr>;
 
 
 class GenericWorker :
@@ -55,7 +53,6 @@ public:
 	QMutex *mutex;
 
 
-	AprilTagsServerPrxPtr apriltagsserver_proxy;
 	CameraRGBDSimplePubPrxPtr camerargbdsimplepub_pubproxy;
 
 	virtual void CameraRGBDSimple_getAll(TImage &im, TDepth &dep) = 0;

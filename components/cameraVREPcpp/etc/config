@@ -2,11 +2,13 @@ CommonBehavior.Endpoints=tcp -p 10000
 
 
 # Endpoints for implemented interfaces
-CameraRGBDSimple.Endpoints=tcp -p 0
+CameraRGBDSimple.Endpoints=tcp -p 10178
 
+ShowImage=true
+Publish=true
+Depth=true
 
-# Proxies for required interfaces
-AprilTagsServerProxy = apriltagsserver:tcp -h localhost -p 0
+CameraName=Camera_Arm
 
 
 # This property is used by the clients to connect to IceStorm.

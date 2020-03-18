@@ -1,12 +1,10 @@
 import "CameraRGBDSimple.idsl";
 import "CameraRGBDSimplePub.idsl";
-import "AprilTagsServer.idsl";
 
 Component cameraVREPcpp
 {
     Communications
     {
-        requires AprilTagsServer;
         implements CameraRGBDSimple;
         publishes CameraRGBDSimplePub;
     };

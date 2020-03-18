@@ -28,7 +28,10 @@
 #define SPECIFICWORKER_H
 
 #include <genericworker.h>
-#include <innermodel/innermodel.h>
+#include <fps/fps.h>
+#include <opencv2/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
 #include <b0RemoteApi.h>
 
 class SpecificWorker : public GenericWorker
@@ -47,8 +50,15 @@ public slots:
 	void compute();
 	void initialize(int period);
 private:
-	std::shared_ptr<InnerModel> innerModel;
-
+	RoboCompCameraRGBDSimple::TDepth depth;
+	RoboCompCameraRGBDSimple::TImage image;
+	int camera;
+	b0RemoteApi *b0Client=nullptr;
+	FPSCounter fps;
+	std::string cameraName;
+	bool SHOW_IMAGE = false;
+	bool DEPTH = false;
+	bool PUBLISH = false;
 };
 
 #endif

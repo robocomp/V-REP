@@ -12,7 +12,10 @@ SET ( HEADERS
   specificmonitor.h
 )
 
-
+INCLUDE( $ENV{ROBOCOMP}/cmake/modules/opencv3.cmake )
 set(CMAKE_CXX_STANDARD 17)
+ADD_DEFINITIONS (-DICE_CPP11_MAPPING -O3 -mavx2 -I /home/robocomp/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/bluezero/include/b0/bindings -I /home/robocomp/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/b0RemoteApiBindings/cpp/ -I /home/robocomp/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/b0RemoteApiBindings/cpp/msgpack-c/include/ -I /home/robocomp/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/programming/remoteApi/)
 
-SET (LIBS ${LIBS} b0 )
+SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fmax-errors=5) 
+
+SET (LIBS ${LIBS}  b0 boost_system )
