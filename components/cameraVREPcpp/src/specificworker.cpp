@@ -39,7 +39,7 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 	try
 	{
 		RoboCompCommonBehavior::Parameter par = params.at("ShowImage");
-		SHOW_IMAGE = (par.value == "true");
+	SHOW_IMAGE = (par.value == "true");
 		par = params.at("Publish");
 		PUBLISH = (par.value == "true");
 		par = params.at("Depth");
@@ -64,11 +64,10 @@ void SpecificWorker::initialize(int period)
 	if( b0RemoteApi::readBool(handle_camera, 0))
 		camera = b0RemoteApi::readInt(handle_camera, 1);
 	else
-		qFatal("Error getting handle to:", cameraName);
+		qFatal("Error getting handle");
 
 	this->Period = period;
 	timer.start(Period);
-
 }
 
 void SpecificWorker::compute()
@@ -82,6 +81,8 @@ void SpecificWorker::compute()
 		int cols = size[0]; int rows = size[1]; int depth = 3; int len = cols*rows*depth;
 		image.width = cols; image.height = rows; image.depth = 3; image.image.resize(len);
 		memcpy(&image.image[0], b0RemoteApi::readByteArray(resImg, 2).data(), len);
+		// move to DoubleBuffer
+		//img_buffer.put(std::move(image));
 	}
 	else
 		qDebug() << __FUNCTION__ << "Error capturing image";
@@ -106,6 +107,7 @@ void SpecificWorker::compute()
 			depth.width = dcols; depth.height = drows; depth.focalx = 617; depth.focaly = 617; depth.alivetime = 0; 
 			depth.depth.resize(dlen); 
 			memcpy(&depth.depth[0], b0RemoteApi::readByteArray(resDepth, 2).data(), dlen);
+			//depth_buffer.put(std::move(depth);
 		}
 		else
 			qDebug() << __FUNCTION__ << "Error capturing depth";	
@@ -113,33 +115,33 @@ void SpecificWorker::compute()
 
 	if(PUBLISH)
 	{
-		try{
+		try
+		{
 			camerargbdsimplepub_pubproxy->pushRGBD(image, depth);
 		}catch(const Ice::Exception &e){std::cout << e << std::endl;}
-
-
 	}
 
 	fps.print();
 }
 
-
-
-
 void SpecificWorker::CameraRGBDSimple_getAll(TImage &im, TDepth &dep)
 {
 	im = image;
 	dep = depth;
+	//img_buffer.get(im);
+	//depth_buffer.get(dep);
 }
 
 void SpecificWorker::CameraRGBDSimple_getDepth(TDepth &dep)
 {
 	dep = depth;
+	//depth_buffer.get(dep);
 }
 
 void SpecificWorker::CameraRGBDSimple_getImage(TImage &im)
 {
 	im = image;
+	//img_buffer.get(im);
 }
 
 

@@ -29,10 +29,12 @@
 
 #include <genericworker.h>
 #include <fps/fps.h>
+#include <doublebuffer/DoubleBuffer.h>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
 #include <b0RemoteApi.h>
+
 
 class SpecificWorker : public GenericWorker
 {
@@ -59,6 +61,10 @@ private:
 	bool SHOW_IMAGE = false;
 	bool DEPTH = false;
 	bool PUBLISH = false;
+
+	//DoubleBuffer<RoboCompCameraRGBDSimple::TImage, RoboCompCameraRGBDSimple::TImage> img_buffer;
+	//DoubleBuffer<RoboCompCameraRGBDSimple::TDepth, RoboCompCameraRGBDSimple::TDepth> depth_buffer;
+	
 };
 
 #endif

@@ -8,7 +8,7 @@ ShowImage=true
 Publish=true
 Depth=true
 
-CameraName=Camera_Arm
+CameraName=camera_1_rgb
 
 
 # This property is used by the clients to connect to IceStorm.
