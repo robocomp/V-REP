@@ -45,16 +45,15 @@ class SpecificWorker(GenericWorker):
 		print("Reading params")
 		self.cameraid = int(params["cameraid"])  # range must be controlled 1..MAX_CAMERAS
 		self.display = "true" in params["display"]
-		self.callapriltags = "true" in params["callapriltags"]
+		self.publish = "true" in params["publish"]
+		self.cameraName = params["cameraName"]
 		self.initialize()
 		return True
 
 	def initialize(self):
 		print("Initialize")
 		self.client = b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient','b0RemoteApiAddOn')
-		#self.wall_camera = self.client.simxGetObjectHandle('camera_' + str(self.cameraid) + '_rgb',self.client.simxServiceCall())
-		self.wall_camera = self.client.simxGetObjectHandle('Camera_Arm', self.client.simxServiceCall())
-		#self.bill = self.client.simxGetObjectHandle('Bill_base#1', self.client.simxServiceCall())
+		self.wall_camera = self.client.simxGetObjectHandle(self.cameraName,self.client.simxServiceCall())
 		self.start = time.time()
 
 	@QtCore.Slot()
@@ -62,11 +61,6 @@ class SpecificWorker(GenericWorker):
 		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
 		depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
 	
-		# success, bill_pos = self.client.simxGetObjectPosition(self.bill[1], -1, self.client.simxServiceCall())
-		# print("pos", bill_pos)
-		# success, bill_ori = self.client.simxGetObjectOrientation(self.bill[1], -1, self.client.simxServiceCall())
-		# print("ori", bill_ori)
-		
 		if not res:
 			return
 
@@ -79,11 +73,9 @@ class SpecificWorker(GenericWorker):
 		self.t_depth.width = resolution[0]
 		self.t_depth.height = resolution[1]
 
-#		self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, TDepth())
+		if self.publish:
+			self.camerargbdsimplepub_proxy.pushRGBD(self.t_image, self.t_depth)
 
-		if self.callapriltags:
-			self.getAprilTags(image, resolution)
-		
 		if self.display:
 			self.displayImage(image, resolution)
 
@@ -91,10 +83,9 @@ class SpecificWorker(GenericWorker):
 
 	def displayImage(self, image, resolution):
 		img = np.fromstring(image, np.uint8).reshape( resolution[1],resolution[0], 3)
-		img = cv2.flip(img, 0)
 		img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 		cv2.drawMarker(img, (int(resolution[0]/2), int(resolution[1]/2)),  (0, 0, 255), cv2.MARKER_CROSS, 100, 1);
-		cv2.imshow("Camera_" + str(self.cameraid), img)
+		cv2.imshow(self.cameraName, img)
 		cv2.waitKey(1)
 		if time.time() - self.start > 1:
 			print("FPS:", self.contFPS)
@@ -102,22 +93,6 @@ class SpecificWorker(GenericWorker):
 			self.contFPS = 0
 		self.contFPS += 1
 	
-	def getAprilTags(self, image, resolution):
-		try:
-			frame = Image()
-			#frame.data = img.flatten()
-			frame.data = image
-			frame.frmt = Format(Mode.RGB888Packet, resolution[0], resolution[1], 3)
-			frame.timeStamp = time.time()
-			# 280 porque es la parte de negro que ocupa todo el png
-			tags_list = self.apriltagsserver_proxy.getAprilTags(frame=frame, tagsize=280, mfx=462, mfy=462);
-			if len(tags_list) > 0:
-				dist = np.sqrt(tags_list[0].tx*tags_list[0].tx+tags_list[0].ty*tags_list[0].ty+tags_list[0].tz*tags_list[0].tz)
-			else:
-				dist = 0
-			print(frame.timeStamp, tags_list,dist)
-		except Ice.Exception as ex:
-			print(ex)
 
 # =============== STUB ==============================================
 # ===================================================================
@@ -125,8 +100,6 @@ class SpecificWorker(GenericWorker):
 	# getImage
 	#
 	def CameraRGBDSimple_getImage(self):
-		#ml = QMutexLocker(self.mutex)
-		#print("returning image", self.t_image.width, self.t_image.height, self.t_image.depth)
 		return self.t_image
 	#
 	# getAll
@@ -142,23 +115,3 @@ class SpecificWorker(GenericWorker):
 
 # ===================================================================
 # ===================================================================
-
-
-
-# res, resolution, image = vrep.simxGetVisionSensorImage(self.clientID, self.camhandle, 0, vrep.simx_opmode_oneshot_wait)
-		# if res is not 0:
-		# 	sys.exit()
-
-		#resD, resolutionD, depth = vrep.simxGetVisionSensorDepthBuffer(self.clientID, self.camDhandle, vrep.simx_opmode_buffer)
-		
-		# imgD = np.array(depth, dtype = np.float32)
-		# imgD.resize([resolutionD[1], resolutionD[0], 1])
-		# imgD = cv2.resize(imgD, (0, 0), None, .5, .5)
-		# #imgD = np.rot90(imgD,2)
-		# #imgD = np.fliplr(imgD)
-		# imgD = cv2.normalize(imgD, None, alpha = 0, beta = 1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-		# imgDD = cv2.cvtColor(imgD, cv2.COLOR_GRAY2BGR)
-
-		# horizontal_concat = np.concatenate((img, imgDD), axis=1)
-
-		#cv2.imshow("ALab_CameraD_0", horizontal_concat)

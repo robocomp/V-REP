@@ -44,18 +44,6 @@ except:
 	print('SLICE_PATH environment variable was not exported. Using only the default paths')
 	pass
 
-ice_AprilTagsServer = False
-for p in icePaths:
-	if os.path.isfile(p+'/AprilTagsServer.ice'):
-		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"AprilTagsServer.ice"
-		Ice.loadSlice(wholeStr)
-		ice_AprilTagsServer = True
-		break
-if not ice_AprilTagsServer:
-	print('Couln\'t load AprilTagsServer')
-	sys.exit(-1)
-from RoboCompAprilTagsServer import *
 ice_CameraRGBDSimplePub = False
 for p in icePaths:
 	if os.path.isfile(p+'/CameraRGBDSimplePub.ice'):
@@ -93,7 +81,6 @@ class GenericWorker(QtCore.QObject):
 		super(GenericWorker, self).__init__()
 
 
-		self.apriltagsserver_proxy = mprx["AprilTagsServerProxy"]
 		self.camerargbdsimplepub_proxy = mprx["CameraRGBDSimplePubPub"]
 
 		

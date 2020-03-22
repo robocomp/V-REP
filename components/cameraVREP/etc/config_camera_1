@@ -1,12 +1,12 @@
 # Endpoints for implemented interfaces
 CameraRGBDSimple.Endpoints=tcp -p 10178
 
-# Proxies for required interfaces
-AprilTagsServerProxy = apriltagsserver:tcp -h localhost -p 12555
 
 cameraid=1
+cameraName=camera_1_rgb
 display=false
-callapriltags=false
+publish=false
+
 
 # This property is used by the clients to connect to IceStorm.
 TopicManager.Proxy=IceStorm/TopicManager:default -p 9999

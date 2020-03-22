@@ -116,23 +116,6 @@ if __name__ == '__main__':
 		print('Cannot connect to IceStorm! ('+proxy+')')
 		status = 1
 
-	# Remote object connection for AprilTagsServer
-	try:
-		proxyString = ic.getProperties().getProperty('AprilTagsServerProxy')
-		try:
-			basePrx = ic.stringToProxy(proxyString)
-			apriltagsserver_proxy = AprilTagsServerPrx.uncheckedCast(basePrx)
-			mprx["AprilTagsServerProxy"] = apriltagsserver_proxy
-		except Ice.Exception:
-			print('Cannot connect to the remote object (AprilTagsServer)', proxyString)
-			#traceback.print_exc()
-			status = 1
-	except Ice.Exception as e:
-		print(e)
-		print('Cannot get AprilTagsServerProxy property.')
-		status = 1
-
-
 	# Create a proxy to publish a CameraRGBDSimplePub topic
 	topic = False
 	try:
