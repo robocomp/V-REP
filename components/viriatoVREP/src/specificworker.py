@@ -55,6 +55,7 @@ class SpecificWorker(GenericWorker):
 		#print(self.x,self.z,self.alpha)
 		return True
 
+# ===================================================================
 # =============== DifferentialRobot interface Methods  ==============
 # ===================================================================
 
@@ -92,7 +93,6 @@ class SpecificWorker(GenericWorker):
 		state.alpha = self.alpha
 		return state
 
-
 	#
 	# setOdometerPose
 	#
@@ -113,5 +113,160 @@ class SpecificWorker(GenericWorker):
 		self.handler.set_base_speed(adv,rot,0)
 
 # ===================================================================
+# =============== CameraRGBDSimple
 # ===================================================================
+
+    #
+    # getAll
+    #
+    def CameraRGBDSimple_getAll(self):
+        #
+        # implementCODE
+        #
+        im = TImage()
+        dep = TDepth()
+        return [im, dep]
+
+
+    #
+    # getDepth
+    #
+    def CameraRGBDSimple_getDepth(self):
+        #
+        # implementCODE
+        #
+        dep = TDepth()
+        return dep
+
+
+    #
+    # getImage
+    #
+    def CameraRGBDSimple_getImage(self):
+        #
+        # implementCODE
+        #
+        im = TImage()
+        return im
+
+
+# ===================================================================
+# Laser
+# ===================================================================
+    #
+    # getLaserAndBStateData
+    #
+    def Laser_getLaserAndBStateData(self):
+        ret = TLaserData()
+        #
+        # implementCODE
+        #
+        bState = RoboCompGenericBase.TBaseState()
+        return [ret, bState]
+
+
+    #
+    # getLaserConfData
+    #
+    def Laser_getLaserConfData(self):
+        ret = LaserConfData()
+        #
+        # implementCODE
+        #
+        return ret
+
+
+    #
+    # getLaserData
+    #
+    def Laser_getLaserData(self):
+        ret = TLaserData()
+        #
+        # implementCODE
+        #
+        return ret
+
+# =================================================
+# === Omnirobot
+# =================================================
+    #
+    # correctOdometer
+    #
+    def OmniRobot_correctOdometer(self, x, z, alpha):
+        #
+        # implementCODE
+        #
+        pass
+
+
+    #
+    # getBasePose
+    #
+    def OmniRobot_getBasePose(self):
+        #
+        # implementCODE
+        #
+        return [self.x, self.z, self.alpha]
+
+
+    #
+    # getBaseState
+    #
+    def OmniRobot_getBaseState(self):
+        #
+        # implementCODE
+        #
+        state = RoboCompGenericBase.TBaseState()
+		state.x = self.x
+		state.z = self.z
+		state.alpha = self.alpha
+        return state
+
+    #
+    # resetOdometer
+    #
+    def OmniRobot_resetOdometer(self):
+        #
+        # implementCODE
+        #
+        pass
+
+
+    #
+    # setOdometer
+    #
+    def OmniRobot_setOdometer(self, state):
+        #
+        # implementCODE
+        #
+        pass
+
+
+    #
+    # setOdometerPose
+    #
+    def OmniRobot_setOdometerPose(self, x, z, alpha):
+        #
+        # implementCODE
+        #
+        pass
+
+
+    #
+    # setSpeedBase
+    #
+    def OmniRobot_setSpeedBase(self, advx, advz, rot):
+        self.handler.set_base_speed(adv,rot,0)
+
+
+    #
+    # stopBase
+    #
+    def OmniRobot_stopBase(self):
+        #
+        # implementCODE
+        #
+        pass
+
+    # ===================================================================
 

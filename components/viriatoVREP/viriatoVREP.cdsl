@@ -1,10 +1,12 @@
-import "DifferentialRobot.idsl";
+import "OmniRobot.idsl";
+import "Laser.idsl";
+import "CameraRGBDSimple.idsl";
 
 Component viriatoVREP
 {
     Communications
     {
-        implements DifferentialRobot;
+        implements OmniRobot, Laser, CameraRGBDSimple;
     };
 	language python;
 };

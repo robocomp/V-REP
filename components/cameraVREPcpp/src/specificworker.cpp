@@ -39,7 +39,7 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 	try
 	{
 		RoboCompCommonBehavior::Parameter par = params.at("ShowImage");
-	SHOW_IMAGE = (par.value == "true");
+		SHOW_IMAGE = (par.value == "true");
 		par = params.at("Publish");
 		PUBLISH = (par.value == "true");
 		par = params.at("Depth");
@@ -67,7 +67,7 @@ void SpecificWorker::initialize(int period)
 		qFatal("Error getting handle");
 
 	this->Period = period;
-	timer.start(Period);
+	timer.start(50);
 }
 
 void SpecificWorker::compute()
@@ -82,18 +82,20 @@ void SpecificWorker::compute()
 		image.width = cols; image.height = rows; image.depth = 3; image.image.resize(len);
 		memcpy(&image.image[0], b0RemoteApi::readByteArray(resImg, 2).data(), len);
 		// move to DoubleBuffer
-		//img_buffer.put(std::move(image));
+		img_buffer.put(image);
 	}
 	else
 		qDebug() << __FUNCTION__ << "Error capturing image";
 
 	if( SHOW_IMAGE )
 	{
-		cv::Mat cvimg = cv::Mat(cv::Size{640,480}, CV_8UC3,  b0RemoteApi::readByteArray(resImg, 2).data() );
-		cv::imshow("", cvimg);
+		//cv::Mat cvimg = cv::Mat(cv::Size{640,480}, CV_8UC3,  b0RemoteApi::readByteArray(resImg, 2).data() );
+		cv::Mat cvimg = cv::Mat(cv::Size{640,480}, CV_8UC3,  &image.image[0] );
+		cv::Mat flipped;
+		cv::flip(cvimg, flipped, 0);
+		cv::imshow("", flipped);
 		cv::waitKey(1);
 	}
-
 
 	//depth image
 	if(DEPTH)
@@ -107,7 +109,7 @@ void SpecificWorker::compute()
 			depth.width = dcols; depth.height = drows; depth.focalx = 617; depth.focaly = 617; depth.alivetime = 0; 
 			depth.depth.resize(dlen); 
 			memcpy(&depth.depth[0], b0RemoteApi::readByteArray(resDepth, 2).data(), dlen);
-			//depth_buffer.put(std::move(depth);
+			//depth_buffer.put(std::move(depth));
 		}
 		else
 			qDebug() << __FUNCTION__ << "Error capturing depth";	
@@ -126,15 +128,16 @@ void SpecificWorker::compute()
 
 void SpecificWorker::CameraRGBDSimple_getAll(TImage &im, TDepth &dep)
 {
-	im = image;
-	dep = depth;
+	//im = image;
+	//dep = depth;
+
 	//img_buffer.get(im);
 	//depth_buffer.get(dep);
 }
 
 void SpecificWorker::CameraRGBDSimple_getDepth(TDepth &dep)
 {
-	dep = depth;
+	//dep = depth;
 	//depth_buffer.get(dep);
 }
 

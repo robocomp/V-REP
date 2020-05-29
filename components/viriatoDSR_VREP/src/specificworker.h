@@ -1,5 +1,5 @@
 /*
- *    Copyright (C)2020 by YOUR NAME HERE
+ *    Copyright (C) 2020 by YOUR NAME HERE
  *
  *    This file is part of RoboComp
  *
@@ -18,23 +18,22 @@
  */
 
 /**
-       \brief
-       @author authorname
+	\brief
+	@author authorname
 */
-
-
 
 #ifndef SPECIFICWORKER_H
 #define SPECIFICWORKER_H
 
 #include <genericworker.h>
-#include <fps/fps.h>
+#include <innermodel/innermodel.h>
 #include <doublebuffer/DoubleBuffer.h>
+#include <b0RemoteApi.h>
+#include <fps/fps.h>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
-#include <b0RemoteApi.h>
-
+#include <cppitertools/chunked.hpp>
 
 class SpecificWorker : public GenericWorker
 {
@@ -47,24 +46,41 @@ public:
 	void CameraRGBDSimple_getAll(TImage &im, TDepth &dep);
 	void CameraRGBDSimple_getDepth(TDepth &dep);
 	void CameraRGBDSimple_getImage(TImage &im);
+	TLaserData Laser_getLaserAndBStateData(RoboCompGenericBase::TBaseState &bState);
+	LaserConfData Laser_getLaserConfData();
+	TLaserData Laser_getLaserData();
+	void OmniRobot_correctOdometer(int x, int z, float alpha);
+	void OmniRobot_getBasePose(int &x, int &z, float &alpha);
+	void OmniRobot_getBaseState(RoboCompGenericBase::TBaseState &state);
+	void OmniRobot_resetOdometer();
+	void OmniRobot_setOdometer(RoboCompGenericBase::TBaseState state);
+	void OmniRobot_setOdometerPose(int x, int z, float alpha);
+	void OmniRobot_setSpeedBase(float advx, float advz, float rot);
+	void OmniRobot_stopBase();
+	void JoystickAdapter_sendData(RoboCompJoystickAdapter::TData data);
+
 
 public slots:
 	void compute();
 	void initialize(int period);
+
 private:
 	RoboCompCameraRGBDSimple::TDepth depth;
 	RoboCompCameraRGBDSimple::TImage image;
-	int camera;
+	RoboCompLaser::TLaserData laser_data;
+	int camera, laser;
 	b0RemoteApi *b0Client=nullptr;
 	FPSCounter fps;
-	std::string cameraName;
+	std::string camera_name, laser_name;
 	bool SHOW_IMAGE = false;
 	bool DEPTH = false;
+	bool LASER = false;
 	bool PUBLISH = false;
+	bool IMAGE = true;
 
 	DoubleBuffer<RoboCompCameraRGBDSimple::TImage, RoboCompCameraRGBDSimple::TImage> img_buffer;
 	//DoubleBuffer<RoboCompCameraRGBDSimple::TDepth, RoboCompCameraRGBDSimple::TDepth> depth_buffer;
-	
+
 };
 
 #endif

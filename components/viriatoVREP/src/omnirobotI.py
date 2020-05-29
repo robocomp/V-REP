@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019 by YOUR NAME HERE
+#    Copyright (C) 2020 by YOUR NAME HERE
 #
 #    This file is part of RoboComp
 #
@@ -21,58 +21,56 @@ import sys, os, Ice
 
 ROBOCOMP = ''
 try:
-	ROBOCOMP = os.environ['ROBOCOMP']
+    ROBOCOMP = os.environ['ROBOCOMP']
 except:
-	print('$ROBOCOMP environment variable not set, using the default value /opt/robocomp')
-	ROBOCOMP = '/opt/robocomp'
+    print('$ROBOCOMP environment variable not set, using the default value /opt/robocomp')
+    ROBOCOMP = '/opt/robocomp'
 if len(ROBOCOMP)<1:
-	print('ROBOCOMP environment variable not set! Exiting.')
-	sys.exit()
+    raise RuntimeError('ROBOCOMP environment variable not set! Exiting.')
+
 
 additionalPathStr = ''
 icePaths = []
 try:
-	icePaths.append('/opt/robocomp/interfaces')
-	SLICE_PATH = os.environ['SLICE_PATH'].split(':')
-	for p in SLICE_PATH:
-		icePaths.append(p)
-		additionalPathStr += ' -I' + p + ' '
+    icePaths.append('/opt/robocomp/interfaces')
+    SLICE_PATH = os.environ['SLICE_PATH'].split(':')
+    for p in SLICE_PATH:
+        icePaths.append(p)
+        additionalPathStr += ' -I' + p + ' '
 except:
-	print('SLICE_PATH environment variable was not exported. Using only the default paths')
-	pass
+    print('SLICE_PATH environment variable was not exported. Using only the default paths')
+    pass
 
-ice_OmniRobot = False
-for p in icePaths:
-	print('Trying', p, 'to load OmniRobot.ice')
-	if os.path.isfile(p+'/OmniRobot.ice'):
-		print('Using', p, 'to load OmniRobot.ice')
-		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"OmniRobot.ice"
-		Ice.loadSlice(wholeStr)
-		ice_OmniRobot = True
-		break
-if not ice_OmniRobot:
-	print('Couldn\'t load OmniRobot')
-	sys.exit(-1)
+
+Ice.loadSlice("-I ./src/ --all ./src/OmniRobot.ice")
+
 from RoboCompOmniRobot import *
 
 class OmniRobotI(OmniRobot):
-	def __init__(self, worker):
-		self.worker = worker
+    def __init__(self, worker):
+        self.worker = worker
 
-	def correctOdometer(self, x, z, alpha, c):
-		return self.worker.correctOdometer(x, z, alpha)
-	def getBasePose(self, c):
-		return self.worker.getBasePose()
-	def resetOdometer(self, c):
-		return self.worker.resetOdometer()
-	def setOdometer(self, state, c):
-		return self.worker.setOdometer(state)
-	def getBaseState(self, c):
-		return self.worker.getBaseState()
-	def setOdometerPose(self, x, z, alpha, c):
-		return self.worker.setOdometerPose(x, z, alpha)
-	def stopBase(self, c):
-		return self.worker.stopBase()
-	def setSpeedBase(self, advx, advz, rot, c):
-		return self.worker.setSpeedBase(advx, advz, rot)
+
+    def correctOdometer(self, x, z, alpha, c):
+        return self.worker.OmniRobot_correctOdometer(x, z, alpha)
+
+    def getBasePose(self, c):
+        return self.worker.OmniRobot_getBasePose()
+
+    def getBaseState(self, c):
+        return self.worker.OmniRobot_getBaseState()
+
+    def resetOdometer(self, c):
+        return self.worker.OmniRobot_resetOdometer()
+
+    def setOdometer(self, state, c):
+        return self.worker.OmniRobot_setOdometer(state)
+
+    def setOdometerPose(self, x, z, alpha, c):
+        return self.worker.OmniRobot_setOdometerPose(x, z, alpha)
+
+    def setSpeedBase(self, advx, advz, rot, c):
+        return self.worker.OmniRobot_setSpeedBase(advx, advz, rot)
+
+    def stopBase(self, c):
+        return self.worker.OmniRobot_stopBase()

@@ -4,6 +4,10 @@ CameraRGBDSimple.Endpoints=tcp -p 10178
 cameraid=1
 display=true
 callapriltags=false
+publish=false
+# cameraName=camera_hand
+cameraName=Camera_Arm
+
 
 # This property is used by the clients to connect to IceStorm.
 TopicManager.Proxy=IceStorm/TopicManager:default -p 9999

@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #
-# Copyright (C) 2019 by YOUR NAME HERE
+#    Copyright (C) 2020 by YOUR NAME HERE
 #
 #    This file is part of RoboComp
 #
@@ -55,7 +55,7 @@
 #
 #
 
-import sys, traceback, IceStorm, subprocess, threading, time, queue, os, copy
+import sys, traceback, IceStorm, time, os, copy
 
 # Ctrl+c handling
 import signal
@@ -66,64 +66,72 @@ from specificworker import *
 
 
 class CommonBehaviorI(RoboCompCommonBehavior.CommonBehavior):
-	def __init__(self, _handler):
-		self.handler = _handler
-	def getFreq(self, current = None):
-		self.handler.getFreq()
-	def setFreq(self, freq, current = None):
-		self.handler.setFreq()
-	def timeAwake(self, current = None):
-		try:
-			return self.handler.timeAwake()
-		except:
-			print('Problem getting timeAwake')
-	def killYourSelf(self, current = None):
-		self.handler.killYourSelf()
-	def getAttrList(self, current = None):
-		try:
-			return self.handler.getAttrList()
-		except:
-			print('Problem getting getAttrList')
-			traceback.print_exc()
-			status = 1
-			return
+    def __init__(self, _handler):
+        self.handler = _handler
+    def getFreq(self, current = None):
+        self.handler.getFreq()
+    def setFreq(self, freq, current = None):
+        self.handler.setFreq()
+    def timeAwake(self, current = None):
+        try:
+            return self.handler.timeAwake()
+        except:
+            print('Problem getting timeAwake')
+    def killYourSelf(self, current = None):
+        self.handler.killYourSelf()
+    def getAttrList(self, current = None):
+        try:
+            return self.handler.getAttrList()
+        except:
+            print('Problem getting getAttrList')
+            traceback.print_exc()
+            status = 1
+            return
 
 #SIGNALS handler
 def sigint_handler(*args):
-	QtCore.QCoreApplication.quit()
+    QtCore.QCoreApplication.quit()
     
 if __name__ == '__main__':
-	app = QtCore.QCoreApplication(sys.argv)
-	params = copy.deepcopy(sys.argv)
-	if len(params) > 1:
-		if not params[1].startswith('--Ice.Config='):
-			params[1] = '--Ice.Config=' + params[1]
-	elif len(params) == 1:
-		params.append('--Ice.Config=config')
-	ic = Ice.initialize(params)
-	status = 0
-	mprx = {}
-	parameters = {}
-	for i in ic.getProperties():
-		parameters[str(i)] = str(ic.getProperties().getProperty(i))
-	if status == 0:
-		worker = SpecificWorker(mprx)
-		worker.setParams(parameters)
-	else:
-		print("Error getting required connections, check config file")
-		sys.exit(-1)
+    app = QtCore.QCoreApplication(sys.argv)
+    params = copy.deepcopy(sys.argv)
+    if len(params) > 1:
+        if not params[1].startswith('--Ice.Config='):
+            params[1] = '--Ice.Config=' + params[1]
+    elif len(params) == 1:
+        params.append('--Ice.Config=etc/config')
+    ic = Ice.initialize(params)
+    status = 0
+    mprx = {}
+    parameters = {}
+    for i in ic.getProperties():
+        parameters[str(i)] = str(ic.getProperties().getProperty(i))
 
-	adapter = ic.createObjectAdapter('DifferentialRobot')
-	adapter.add(DifferentialRobotI(worker), ic.stringToIdentity('differentialrobot'))
-	adapter.activate()
+    if status == 0:
+        worker = SpecificWorker(mprx)
+        worker.setParams(parameters)
+    else:
+        print("Error getting required connections, check config file")
+        sys.exit(-1)
 
+    adapter = ic.createObjectAdapter('CameraRGBDSimple')
+    adapter.add(CameraRGBDSimpleI(worker), ic.stringToIdentity('camerargbdsimple'))
+    adapter.activate()
 
-	signal.signal(signal.SIGINT, sigint_handler)
-	app.exec_()
+    adapter = ic.createObjectAdapter('Laser')
+    adapter.add(LaserI(worker), ic.stringToIdentity('laser'))
+    adapter.activate()
 
-	if ic:
-		try:
-			ic.destroy()
-		except:
-			traceback.print_exc()
-			status = 1
+    adapter = ic.createObjectAdapter('OmniRobot')
+    adapter.add(OmniRobotI(worker), ic.stringToIdentity('omnirobot'))
+    adapter.activate()
+
+    signal.signal(signal.SIGINT, sigint_handler)
+    app.exec_()
+
+    if ic:
+        try:
+            ic.destroy()
+        except:
+            traceback.print_exc()
+            status = 1

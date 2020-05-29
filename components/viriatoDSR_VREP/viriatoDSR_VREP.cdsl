@@ -1,0 +1,15 @@
+import "CameraRGBDSimple.idsl";
+import "Laser.idsl";
+import "OmniRobot.idsl";
+import "JoystickAdapter.idsl";
+
+Component cameraVREPcpp
+{
+    Communications
+    {
+        implements CameraRGBDSimple, Laser, OmniRobot;
+        subscribesTo JoystickAdapter;
+    };
+	language Cpp11;
+};
+
