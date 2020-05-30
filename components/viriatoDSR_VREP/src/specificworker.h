@@ -80,7 +80,7 @@ private:
 
 	DoubleBuffer<RoboCompCameraRGBDSimple::TImage, RoboCompCameraRGBDSimple::TImage> img_buffer;
 	//DoubleBuffer<RoboCompCameraRGBDSimple::TDepth, RoboCompCameraRGBDSimple::TDepth> depth_buffer;
-
+	DoubleBuffer<RoboCompJoystickAdapter::TData, RoboCompJoystickAdapter::TData> joy_buffer;
 };
 
 #endif

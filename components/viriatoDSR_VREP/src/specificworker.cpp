@@ -151,6 +151,24 @@ void SpecificWorker::compute()
 		else
 			qDebug() << __FUNCTION__ << "Error receiving laser data";
 	}
+
+	auto j = joy_buffer.get();
+	if(j.has_value())
+	{
+		float rot = 0; float adv = 0; float side = 0;
+		for(auto x: j.value().axes)
+		{
+			if(x.name=="advance")
+				adv = x.value/100.;
+			if(x.name=="rotate")
+				rot = x.value/100.;
+			if(x.name=="side")
+				side = x.value/100.;
+			
+			OmniRobot_setSpeedBase(adv, side, rot);
+		}
+	}
+
 	fps.print();
 }
 
@@ -249,9 +267,11 @@ void SpecificWorker::OmniRobot_stopBase()
 
 void SpecificWorker::JoystickAdapter_sendData(RoboCompJoystickAdapter::TData data)
 {
-	qDebug() << QString::fromStdString(data.id);
+	//qDebug() << QString::fromStdString(data.id);
 	for(auto x: data.axes)
 	{
-		qDebug() << QString::fromStdString(x.name) << x.value;
+		//qDebug() << QString::fromStdString(x.name) << (float)(x.value/500);
+		//OmniRobot_setSpeedBase(0, 0, 0);
+		joy_buffer.put(data);
 	}
 }
