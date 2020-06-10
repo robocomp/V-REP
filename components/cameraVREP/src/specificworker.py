@@ -25,13 +25,14 @@ import math
 import time
 import numpy as np
 import b0RemoteApi
+import random
 
 class SpecificWorker(GenericWorker):
-	def __init__(self, proxy_map):
+	def __init__(self, proxy_map, startup_check=False):
 		super(SpecificWorker, self).__init__(proxy_map)
 
-		self.t_image = TImage()
-		self.t_depth = TDepth()
+		self.t_image = RoboCompCameraRGBDSimple.TImage()
+		self.t_depth = RoboCompCameraRGBDSimple.TDepth()
 		self.timer.timeout.connect(self.compute)
 		self.Period = 50
 		self.timer.start(self.Period)
@@ -54,10 +55,22 @@ class SpecificWorker(GenericWorker):
 		print("Initialize")
 		self.client = b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient','b0RemoteApiAddOn')
 		self.wall_camera = self.client.simxGetObjectHandle(self.cameraName,self.client.simxServiceCall())
+#		res, self.bill = self.client.simxLoadModelFromFile('/home/rcintas/Software/CoppeliaSim_Edu_V4_0_0_Ubuntu18_04/models/people/Walking_Bill.ttm', self.client.simxServiceCall())
+#		print(res, self.bill)
 		self.start = time.time()
 
 	@QtCore.Slot()
 	def compute(self):
+#		res, p = self.client.simxGetObjectPosition(self.bill,-1, self.client.simxServiceCall())
+#		print(res)
+#		if(res):
+#			print(p)
+#			p[1] = -2.5 + random.random() * 5
+#			p[2] = -2.5 + random.random() * 5
+#			self.client.simxSetObjectPosition(self.bill, -1, p, self.client.simxServiceCall())
+		
+		
+		
 		res, resolution, image = self.client.simxGetVisionSensorImage(self.wall_camera[1],False, self.client.simxServiceCall())
 		depth_res, depth_resolution, depth = self.client.simxGetVisionSensorDepthBuffer(self.wall_camera[1],True, True, self.client.simxServiceCall())
 	

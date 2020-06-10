@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 by YOUR NAME HERE
+#    Copyright (C) 2020 by YOUR NAME HERE
 #
 #    This file is part of RoboComp
 #
@@ -23,81 +23,86 @@ from PySide2 import QtWidgets, QtCore
 
 ROBOCOMP = ''
 try:
-	ROBOCOMP = os.environ['ROBOCOMP']
+    ROBOCOMP = os.environ['ROBOCOMP']
 except KeyError:
-	print('$ROBOCOMP environment variable not set, using the default value /opt/robocomp')
-	ROBOCOMP = '/opt/robocomp'
+    print('$ROBOCOMP environment variable not set, using the default value /opt/robocomp')
+    ROBOCOMP = '/opt/robocomp'
 
-preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ --all /opt/robocomp/interfaces/"
-Ice.loadSlice(preStr+"CommonBehavior.ice")
+Ice.loadSlice("-I ./src/ --all ./src/CommonBehavior.ice")
 import RoboCompCommonBehavior
 
-additionalPathStr = ''
-icePaths = [ '/opt/robocomp/interfaces' ]
-try:
-	SLICE_PATH = os.environ['SLICE_PATH'].split(':')
-	for p in SLICE_PATH:
-		icePaths.append(p)
-		additionalPathStr += ' -I' + p + ' '
-	icePaths.append('/opt/robocomp/interfaces')
-except:
-	print('SLICE_PATH environment variable was not exported. Using only the default paths')
-	pass
+Ice.loadSlice("-I ./src/ --all ./src/CameraRGBDSimple.ice")
+import RoboCompCameraRGBDSimple
+Ice.loadSlice("-I ./src/ --all ./src/CameraRGBDSimplePub.ice")
+import RoboCompCameraRGBDSimplePub
 
-ice_CameraRGBDSimplePub = False
-for p in icePaths:
-	if os.path.isfile(p+'/CameraRGBDSimplePub.ice'):
-		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"CameraRGBDSimplePub.ice"
-		Ice.loadSlice(wholeStr)
-		ice_CameraRGBDSimplePub = True
-		break
-if not ice_CameraRGBDSimplePub:
-	print('Couln\'t load CameraRGBDSimplePub')
-	sys.exit(-1)
-from RoboCompCameraRGBDSimplePub import *
-ice_CameraRGBDSimple = False
-for p in icePaths:
-	if os.path.isfile(p+'/CameraRGBDSimple.ice'):
-		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"CameraRGBDSimple.ice"
-		Ice.loadSlice(wholeStr)
-		ice_CameraRGBDSimple = True
-		break
-if not ice_CameraRGBDSimple:
-	print('Couln\'t load CameraRGBDSimple')
-	sys.exit(-1)
-from RoboCompCameraRGBDSimple import *
+class ImgType(list):
+    def __init__(self, iterable=list()):
+        super(ImgType, self).__init__(iterable)
+
+    def append(self, item):
+        assert isinstance(item, byte)
+        super(ImgType, self).append(item)
+
+    def extend(self, iterable):
+        for item in iterable:
+            assert isinstance(item, byte)
+        super(ImgType, self).extend(iterable)
+
+    def insert(self, index, item):
+        assert isinstance(item, byte)
+        super(ImgType, self).insert(index, item)
+
+setattr(RoboCompCameraRGBDSimple, "ImgType", ImgType)
+
+class DepthType(list):
+    def __init__(self, iterable=list()):
+        super(DepthType, self).__init__(iterable)
+
+    def append(self, item):
+        assert isinstance(item, byte)
+        super(DepthType, self).append(item)
+
+    def extend(self, iterable):
+        for item in iterable:
+            assert isinstance(item, byte)
+        super(DepthType, self).extend(iterable)
+
+    def insert(self, index, item):
+        assert isinstance(item, byte)
+        super(DepthType, self).insert(index, item)
+
+setattr(RoboCompCameraRGBDSimple, "DepthType", DepthType)
 
 
-from camerargbdsimpleI import *
+import camerargbdsimpleI
+
+
 
 
 class GenericWorker(QtCore.QObject):
 
-	kill = QtCore.Signal()
+    kill = QtCore.Signal()
 
-	def __init__(self, mprx):
-		super(GenericWorker, self).__init__()
+    def __init__(self, mprx):
+        super(GenericWorker, self).__init__()
 
+        self.camerargbdsimplepub_proxy = mprx["CameraRGBDSimplePubPub"]
 
-		self.camerargbdsimplepub_proxy = mprx["CameraRGBDSimplePubPub"]
-
-		
-		self.mutex = QtCore.QMutex(QtCore.QMutex.Recursive)
-		self.Period = 30
-		self.timer = QtCore.QTimer(self)
+        self.mutex = QtCore.QMutex(QtCore.QMutex.Recursive)
+        self.Period = 30
+        self.timer = QtCore.QTimer(self)
 
 
-	@QtCore.Slot()
-	def killYourSelf(self):
-		rDebug("Killing myself")
-		self.kill.emit()
+    @QtCore.Slot()
+    def killYourSelf(self):
+        rDebug("Killing myself")
+        self.kill.emit()
 
-	# \brief Change compute period
-	# @param per Period in ms
-	@QtCore.Slot(int)
-	def setPeriod(self, p):
-		print("Period changed", p)
-		self.Period = p
-		self.timer.start(self.Period)
+    # \brief Change compute period
+    # @param per Period in ms
+    @QtCore.Slot(int)
+    def setPeriod(self, p):
+        print("Period changed", p)
+        self.Period = p
+        self.timer.start(self.Period)

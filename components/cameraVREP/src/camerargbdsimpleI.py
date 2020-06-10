@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020 by YOUR NAME HERE
+#    Copyright (C) 2020 by YOUR NAME HERE
 #
 #    This file is part of RoboComp
 #
@@ -21,48 +21,28 @@ import sys, os, Ice
 
 ROBOCOMP = ''
 try:
-	ROBOCOMP = os.environ['ROBOCOMP']
+    ROBOCOMP = os.environ['ROBOCOMP']
 except:
-	print('$ROBOCOMP environment variable not set, using the default value /opt/robocomp')
-	ROBOCOMP = '/opt/robocomp'
+    print('$ROBOCOMP environment variable not set, using the default value /opt/robocomp')
+    ROBOCOMP = '/opt/robocomp'
 if len(ROBOCOMP)<1:
-	print('ROBOCOMP environment variable not set! Exiting.')
-	sys.exit()
+    raise RuntimeError('ROBOCOMP environment variable not set! Exiting.')
 
-additionalPathStr = ''
-icePaths = []
-try:
-	icePaths.append('/opt/robocomp/interfaces')
-	SLICE_PATH = os.environ['SLICE_PATH'].split(':')
-	for p in SLICE_PATH:
-		icePaths.append(p)
-		additionalPathStr += ' -I' + p + ' '
-except:
-	print('SLICE_PATH environment variable was not exported. Using only the default paths')
-	pass
 
-ice_CameraRGBDSimple = False
-for p in icePaths:
-	print('Trying', p, 'to load CameraRGBDSimple.ice')
-	if os.path.isfile(p+'/CameraRGBDSimple.ice'):
-		print('Using', p, 'to load CameraRGBDSimple.ice')
-		preStr = "-I/opt/robocomp/interfaces/ -I"+ROBOCOMP+"/interfaces/ " + additionalPathStr + " --all "+p+'/'
-		wholeStr = preStr+"CameraRGBDSimple.ice"
-		Ice.loadSlice(wholeStr)
-		ice_CameraRGBDSimple = True
-		break
-if not ice_CameraRGBDSimple:
-	print('Couldn\'t load CameraRGBDSimple')
-	sys.exit(-1)
+Ice.loadSlice("-I ./src/ --all ./src/CameraRGBDSimple.ice")
+
 from RoboCompCameraRGBDSimple import *
 
 class CameraRGBDSimpleI(CameraRGBDSimple):
-	def __init__(self, worker):
-		self.worker = worker
+    def __init__(self, worker):
+        self.worker = worker
 
-	def getAll(self, c):
-		return self.worker.CameraRGBDSimple_getAll()
-	def getDepth(self, c):
-		return self.worker.CameraRGBDSimple_getDepth()
-	def getImage(self, c):
-		return self.worker.CameraRGBDSimple_getImage()
+
+    def getAll(self, c):
+        return self.worker.CameraRGBDSimple_getAll()
+
+    def getDepth(self, c):
+        return self.worker.CameraRGBDSimple_getDepth()
+
+    def getImage(self, c):
+        return self.worker.CameraRGBDSimple_getImage()
